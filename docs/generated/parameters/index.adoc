@@ -1,1 +1,3 @@
-// placeholder
+
+=== Launch into an existing VPC
+include::compliance-hipaa-entrypoint.template.adoc[]
