@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.12">
-<title>Reference Architecture for HIPAA on AWS on the AWS Cloud</title>
+<meta name="generator" content="Asciidoctor 2.0.15">
+<title>HIPAA Reference Architecture on the AWS Cloud</title>
 <style>
 
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -182,7 +182,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
   padding-top:0;
   overflow:hidden;
   background:#283e5b;
-  border-bottom: 4px solid #435c7c;
+  /* border-bottom: 4px solid #435c7c; */
   width:320px;
   height:154px;
   top:0;
@@ -411,7 +411,7 @@ span.icon>.fa{cursor:default}
 a span.icon>.fa{cursor:inherit}
 .admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
 .admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
-.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";color: rgb(3, 87, 21);}
 .admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
 .admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
 .admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
@@ -747,8 +747,43 @@ p {
   font-weight  : 300 !important;
 }
 
-#toc.toc2 #toctitle{
-  background-image: url('images/AWS-Logo.svg');
+/* image layout */
+#toc.toc2 #toctitle {
+  background-image: url("images/AWS-Logo.svg");
+  background-repeat: no-repeat;
+  background-size: 50%;
+  background-position: center;
+  width: auto;
+  height: 15%;
+}
+
+/* Left Navbar size */
+#toc.toc2 {
+  width: 17%;
+  min-width: 15em;
+}
+
+/* auto width for main page */
+body.toc2 {
+  padding-left: 22%;
+  padding-right: 2%;
+}
+
+/* hide left nav bar if page size is smaller than 767px */
+@media screen and (max-width: 767px) {
+  #toc {
+      display: none !important;
+  }
+  body.toc2 {
+    padding-left: 1%;
+    padding-right: 1%;
+    position: relative;
+  }
+
+  #content {
+    padding-left: 2%;
+    padding-right: 2%;
+  }
 }
 
 /* QS Tables */
@@ -790,7 +825,7 @@ p.footer-text a{color:#d7d8d8}
 <div id="toctitle"></div>
 <ul class="sectlevel1">
 <li><a href="#_overview">Overview</a></li>
-<li><a href="#_reference_architecture_for_hipaa_on_aws_on_aws">Reference Architecture for HIPAA on AWS on AWS</a></li>
+<li><a href="#_hipaa_reference_architecture_on_aws">HIPAA Reference Architecture on AWS</a></li>
 <li><a href="#_aws_costs">AWS costs</a></li>
 <li><a href="#_software_licenses">Software licenses</a></li>
 <li><a href="#_architecture">Architecture</a></li>
@@ -807,12 +842,11 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_launch_the_quick_start">Launch the Quick Start</a></li>
 </ul>
 </li>
-<li><a href="#_security">Security</a></li>
-<li><a href="#_additional_resources">Additional Resources</a></li>
-<li><a href="#_troubleshooting">Troubleshooting</a></li>
+<li><a href="#_resources">Resources</a></li>
+<li><a href="#_faq">FAQ</a></li>
 <li><a href="#_parameter_reference">Parameter reference</a>
 <ul class="sectlevel2">
-<li><a href="#_launch_into_an_existing_vpc">Launch into an existing VPC</a></li>
+<li><a href="#_parameters_for_deploying_hipaa_reference_architecture">Parameters for deploying HIPAA Reference Architecture</a></li>
 </ul>
 </li>
 <li><a href="#_send_us_feedback">Send us feedback</a></li>
@@ -825,7 +859,7 @@ p.footer-text a{color:#d7d8d8}
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<h2 id="_reference_architecture_for_hipaa_on_aws_on_the_aws_cloud" class="discrete text-center">Reference Architecture for HIPAA on AWS on the AWS Cloud</h2>
+<h2 id="_hipaa_reference_architecture_on_the_aws_cloud" class="discrete text-center">HIPAA Reference Architecture on the AWS Cloud</h2>
 <h2 id="_quick_start_reference_deployment" class="discrete text-left text-center">Quick Start Reference Deployment</h2>
 <div class="imageblock text-center">
 <div class="content">
@@ -833,8 +867,8 @@ p.footer-text a{color:#d7d8d8}
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>January 2021</strong><br>
-<em>Tom Burge, Justin Stanley, Donny Wilson, Kevin Cox, Rich Nahra, Bakha Nurzhanov, Vanessa Jacobs, Amazon Web Services</em><br>
+<p><strong>May 2021</strong><br>
+<em>Tom Burge, Justin Stanley, Donny Wilson, Kevin Cox, Rich Nahra, Bakha Nurzhanov, and Vanessa Jacobs, AWS Healthcare team</em><br>
 <em>Andrew Gargan, AWS Quick Start team</em></p>
 </div>
 <div class="admonitionblock tip text-left">
@@ -851,67 +885,21 @@ report bugs, or submit feature ideas for this Quick Start.
 </table>
 </div>
 <div class="paragraph text-left">
-<p>This Quick Start was created by Amazon Web Services in collaboration with Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that use AWS CloudFormation templates to deploy key technologies on AWS, following AWS best practices.</p>
+<p>This Quick Start was created by Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that use AWS CloudFormation templates to deploy key technologies on AWS, following AWS best practices.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<strong>IMPORTANT PLEASE READ: You must have an AWS Business Associate Addendum (BAA) in place, and follow its configuration requirements, before running protected health information (PHI) workloads on AWS.</strong> You should not use your AWS account in connection with PHI until you have accepted the AWS BAA and configured your AWS account(s) as required by the AWS BAA. Under HIPAA regulations, covered entities and business associates are responsible for putting in place a business associate agreement between themselves and each of their business associates. You are solely responsible for determining whether you and your organization need a business associate agreement with AWS. <strong>If you determine you need a business associate agreement with AWS, you can</strong> <a href="https://aws.amazon.com/artifact/getting-started/#BAA_Agreements">accept the AWS BAA through a self-service portal in AWS Artifact</a>. It is your responsibility to obtain a BAA from AWS. For more information about the AWS BAA, please visit the <a href="https://aws.amazon.com/compliance/hipaa-compliance/">AWS HIPAA Compliance webpage</a>.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<strong>This Quick Start does not address state-specific laws that may apply to you.</strong> This Quick Start only addresses requirements set forth under HIPAA, a U.S. federal law. Many individual states have adopted rules that are different and in some cases, stricter than those that are federally mandated under HIPAA.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<strong>This Quick Start will not, by itself, make you HIPAA-compliant.</strong> The information contained in this Quick Start package is not exhaustive, and must be reviewed, evaluated, assessed, and approved by you in connection with your organization’s particular security features, tools, and configurations. The security controls reference document included with this Quick Start explains how this Quick Start can be used to help support your compliance with certain requirements under the HIPAA Privacy and Security Rules. <strong>However, it is the sole responsibility of you and your organization to determine which HIPAA regulatory requirements are applicable to you, and to ensure that you comply with those applicable requirements.</strong> Importantly, most of the requirements under HIPAA are not technical but administrative (that is, people- and process-oriented). Although the security controls reference that is included with this Quick Start lists and discusses both the technical and administrative requirements, this Quick Start cannot help you comply with the non-technical HIPAA requirements.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<strong>Does HIPAA Apply to your Organization?</strong>
-Customers are solely responsible for determining whether HIPAA applies to them, and if so, for complying with their obligations under HIPAA, the AWS BAA, and all other applicable laws, rules, and regulations. AWS does not provide legal or compliance advice. Customers should consult with qualified legal counsel or consultants, as needed, to ensure that their use of AWS complies with HIPAA, the terms of the AWS BAA, and other applicable laws, rules, and regulations.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>This guide provides instructions for deploying the U.S. Health Insurance Portability and Accountability Act (HIPAA) Reference Architecture Quick Start on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This guide provides instructions for deploying the Reference Architecture for HIPAA Quick Start reference architecture on the AWS Cloud.<br></p>
+<p>This Quick Start is for people in the healthcare industry who are looking for guidance on implementing HIPAA-ready environments in the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start is for users who in the healthcare industry that are looking for guidance on implementing HIPAA ready environments on the AWS Cloud.</p>
+<p>This Quick Start is part of a set of AWS compliance offerings, which provide security-focused architectures to help managed service providers, cloud-provisioning teams, developers, integrators, and information-security teams follow strict security, compliance, and risk-management controls. For other Quick Starts in this category, see the <a href="https://aws.amazon.com/quickstart/?solutions-all.sort-by=item.additionalFields.sortDate&amp;solutions-all.sort-order=desc&amp;awsf.filter-tech-category=tech-category%23security-identity-compliance&amp;awsf.filter-industry=*all&amp;awsf.filter-source-category=*all&amp;awsf.filter-content-type=*all" target="_blank" rel="noopener">Quick Start catalog</a>.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -920,18 +908,50 @@ Customers are solely responsible for determining whether HIPAA applies to them, 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Amazon may share user-deployment information with the AWS Partner that collaborated with AWS on the Quick Start.
+Deploying this Quick Start does not guarantee an organization’s compliance with any laws, certifications, policies, or other regulations.
 </td>
 </tr>
 </table>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">IMPORTANT—PLEASE READ</div>
+<div class="paragraph">
+<p><strong>You must have an AWS Business Associate Addendum (BAA) in place, and follow its configuration requirements, before running protected health information (PHI) workloads on AWS.</strong> You should not use your AWS account in connection with PHI until you have accepted the AWS BAA and configured your AWS account as required by the AWS BAA. Under HIPAA regulations, covered entities and business associates are responsible for putting in place a business associate agreement between themselves and each of their business associates. You are solely responsible for determining whether you and your organization need a business associate agreement with AWS. <strong>If you determine that you need a business associate agreement with AWS, you can <a href="https://aws.amazon.com/artifact/getting-started/#BAA_Agreements" target="_blank" rel="noopener">accept the AWS BAA through a self-service portal in AWS Artifact</a></strong>. It is your responsibility to obtain a BAA from AWS. For more information about the AWS BAA, visit the <a href="https://aws.amazon.com/compliance/hipaa-compliance/" target="_blank" rel="noopener">AWS HIPAA Compliance webpage</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>This Quick Start does not address state-specific laws that may apply to you.</strong> This Quick Start only addresses requirements set forth under HIPAA, a U.S. federal law. Many individual states have adopted rules that are different and in some cases, stricter than those that are federally mandated under HIPAA.</p>
+</div>
+<div class="paragraph">
+<p><strong>This Quick Start will not, by itself, make you HIPAA-compliant.</strong> The information contained in this Quick Start package is not exhaustive, and must be reviewed, evaluated, assessed, and approved by you in connection with your organization&#8217;s particular security features, tools, and configurations. Download the <a href="https://fwd.aws/7M7b9?" target="_blank" rel="noopener">security controls matrix</a>, a spreadsheet included with this Quick Start, for an explanation of how this Quick Start can be used to help support your compliance with certain requirements under the HIPAA Privacy and Security Rules. <strong>However, it is the sole responsibility of you and your organization to determine which HIPAA regulatory requirements are applicable to you, and to ensure that you comply with those applicable requirements.</strong> Importantly, most of the requirements under HIPAA are not technical but administrative (that is, people- and process-oriented). Although the <a href="https://fwd.aws/7M7b9?" target="_blank" rel="noopener">security controls matrix</a> that is included with this Quick Start lists and discusses both the technical and administrative requirements, this Quick Start cannot help you comply with the nontechnical HIPAA requirements.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Does HIPAA apply to your organization?</strong></p>
+</div>
+<div class="paragraph">
+<p>Customers are solely responsible for determining whether HIPAA applies to them, and if so, for complying with their obligations under HIPAA, the AWS BAA, and all other applicable laws, rules, and regulations. AWS does not provide legal or compliance advice. Customers should consult with qualified legal counsel or consultants, as needed, to ensure that their use of AWS complies with HIPAA, the terms of the AWS BAA, and other applicable laws, rules, and regulations.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_reference_architecture_for_hipaa_on_aws_on_aws">Reference Architecture for HIPAA on AWS on AWS</h2>
+<h2 id="_hipaa_reference_architecture_on_aws">HIPAA Reference Architecture on AWS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>&lt;Describe how the software works on AWS.&gt;</p>
+<p>The HIPAA Reference Architecture Quick Start helps automate building a baseline architecture that fits within your organization&#8217;s larger HIPAA-compliance program. Like other AWS compliance architectures, it helps streamline, automate, and implement secure baselines in AWS—from initial design to operational security readiness. It incorporates the expertise of AWS solutions architects, security, and compliance personnel to help you build a secure and reliable architecture through automation.</p>
+</div>
+<div class="paragraph">
+<p>This Quick Start includes AWS CloudFormation templates, which can be integrated with AWS Service Catalog, to automate building a baseline architecture that fits within your organization&#8217;s larger HIPAA-compliance program. It also includes a <a href="https://fwd.aws/7M7b9?" target="_blank" rel="noopener">downloadable security controls matrix</a> (Microsoft Excel spreadsheet), which maps HIPAA regulatory requirements to AWS Quick Start implementation. <a href="#matrix-excerpt">Figure 1</a> provides an excerpt of the information in that spreadsheet.</p>
+</div>
+<div id="matrix-excerpt" class="imageblock">
+<div class="content">
+<a class="image" href="images/security-controls-matrix-excerpt.png"><img src="images/security-controls-matrix-excerpt.png" alt="security-controls-matrix-excerpt"></a>
+</div>
+<div class="title">Figure 1. Security controls matrix (excerpt)</div>
+</div>
+<div class="paragraph">
+<p>You must process, store, and transmit protected health information (PHI) using only HIPAA-eligible AWS services, as defined in the AWS BAA. You may use the full range of AWS services with non-PHI data, even in a HIPAA account under the AWS BAA. For the current list of HIPAA-eligible services, see <a href="https://aws.amazon.com/compliance/hipaa-eligible-services-reference/" target="_blank" rel="noopener">HIPAA Eligible Services Reference</a>.</p>
 </div>
 </div>
 </div>
@@ -955,7 +975,7 @@ see the pricing pages for each AWS service you use. Prices are subject to change
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html" target="_blank" rel="noopener">create AWS Cost and Usage Reports</a> to deliver billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. These reports provide cost estimates based on usage throughout each month and aggregate the data at the end of the month. For more information, see <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html" target="_blank" rel="noopener">What are AWS Cost and Usage Reports?</a>
+After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html" target="_blank" rel="noopener">AWS Cost and Usage Reports</a> to deliver billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. These reports provide cost estimates based on usage throughout each month and aggregate the data at the end of the month. For more information, see <a href="https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html" target="_blank" rel="noopener">What are AWS Cost and Usage Reports?</a>
 </td>
 </tr>
 </table>
@@ -974,56 +994,113 @@ After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccoun
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>AWS compliance solutions help streamline, automate, and implement secure baselines in AWS—from initial design to operational security readiness. They incorporate the expertise of AWS solutions architects, security, and compliance personnel to help you build a secure and reliable architecture easily through automation.<br></p>
-</div>
-<div class="paragraph">
-<p>This Quick Start includes AWS CloudFormation templates, which can be integrated with AWS Service Catalog, to automate building a baseline architecture that fits within your organization&#8217;s larger HIPAA compliance program. It also includes a security controls reference, which maps HIPAA regulatory requirements to architecture decisions, features, and configuration of the baseline.</p>
+<p>Deploying this Quick Start with default parameters builds the following HIPAA Reference Architecture environment in the AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
-<img src="images/architecture_diagram.png" alt="Architecture" width="100%" height="100%">
+<img src="images/hipaa-compliance-architecture-diagram.png" alt="Architecture">
 </div>
-<div class="title">Figure 1. Quick Start architecture for Reference Architecture for HIPAA on AWS</div>
+<div class="title">Figure 2. HIPAA Reference Architecture Quick Start on AWS</div>
 </div>
 <div class="paragraph">
-<p>As shown in <a href="#architecture1">Figure 1</a>, the Quick Start sets up the following:</p>
+<p>As shown in <a href="#architecture1">Figure 2</a>, the Quick Start sets up the following:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>A highly available architecture with three Virtual Private Clouds (VPCs) with subnets spanning two Availability Zones, according to AWS best practices, to provide you with your own virtual network on AWS.</p>
+<p>A highly available architecture that spans two Availability Zones.</p>
 </li>
 <li>
-<p>A highly available centralized point of egress for Internet traffic.</p>
+<p>Three virtual private clouds (VPCs): management, production, and development. The VPCs are configured with subnets, according to AWS best practices, to provide you with your own virtual network on AWS.</p>
 </li>
 <li>
-<p>A Transit Gateway for VPC to VPC communication and connection point for customer connectivity (Site to Site VPN or Direct Connect).</p>
+<p>In the management VPC:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>An internet gateway, which serves as a highly available <a href="https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-egress-to-internet.html" target="_blank" rel="noopener">centralized point of egress for internet traffic</a>.</p>
 </li>
 <li>
-<p>AWS CloudTrail for AWS access logging with logs delivered to a secure Simple Storage Service (S3) Bucket.</p>
+<p>Public subnets that include managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.</p>
 </li>
 <li>
-<p>AWS CloudWatch for metric monitoring and threshold alarms with logs delivered to a secure Simple Storage Service (S3) Bucket.</p>
+<p>Private subnets for deploying your security and infrastructure controls.</p>
 </li>
 <li>
-<p>AWS Config with the Conformance Pack for HIPAA that maps HIPAA controls to AWS configuration items.</p>
-</li>
-<li>
-<p>Amazon Simple Notification Service Topic for sending email alerts from alarms.</p>
+<p>Flow logs for auditing.</p>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p><strong>AWS Services</strong><br>
-<a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html">AWS CloudTrail</a> – AWS CloudTrail records AWS API calls and delivers log files that include caller identity, time, source IP address, request parameters, and response elements. The call history and details provided by CloudTrail enable security analysis, resource change tracking, and compliance auditing.<br>
-<a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html">Amazon CloudWatch</a> – Amazon CloudWatch is a monitoring service for AWS Cloud resources and the applications you run on AWS. You can use CloudWatch to collect and track metrics, collect and monitor log files, set alarms, and automatically react to changes in your AWS resources.<br>
-<a href="https://docs.aws.amazon.com/config/latest/developerguide/">AWS Config</a> – AWS Config is a fully managed service that provides you with an AWS resource inventory, configuration history, and configuration change notifications to enable security and governance. AWS Config rules enable you to automatically check the configuration of AWS resources recorded by AWS Config.<br>
-<a href="https://docs.aws.amazon.com/glacier/">Amazon S3 Glacier</a> – Amazon S3 Glacier is a storage service for archiving and long-term backup of infrequently used data. It provides secure, durable, and extremely low-cost storage, supports data transfer over SSL, and automatically encrypts data at rest. With S3 Glacier, you can store your data for months, years, or even decades at a very low cost.<br>
-<a href="https://aws.amazon.com/documentation/vpc/">Amazon VPC</a> – The Amazon Virtual Private Cloud (Amazon VPC) service lets you provision a private, logically isolated section of the AWS Cloud where you can launch AWS services and other resources in a virtual network that you define. You have complete control over your virtual networking environment, including selection of your own IP address range, creation of subnets, and configuration of route tables and network gateways.<br></p>
+</li>
+<li>
+<p>In the production VPC:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Private subnets for deploying your production workloads.</p>
+</li>
+<li>
+<p>Flow logs for auditing.</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p><strong>HIPAA Eligible Services</strong><br>
-You must process, store, and transmit protected health information (PHI) using only HIPAA Eligible Services, as defined in the AWS BAA. The most current list of HIPAA Eligible Services can be found at <a href="https://aws.amazon.com/compliance/hipaa-eligible-services-reference/" class="bare">https://aws.amazon.com/compliance/hipaa-eligible-services-reference/</a>. You may use the full range of AWS services with non-PHI data, even in a HIPAA Account under the AWS BAA.</p>
+</li>
+<li>
+<p>In the development VPC:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Private subnets for deploying your development workloads.</p>
+</li>
+<li>
+<p>Flow logs for auditing.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>AWS Transit Gateway for VPC-to-VPC communication and customer connectivity.</p>
+</li>
+<li>
+<p>For logging and audit controls:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Amazon CloudWatch for metric monitoring and threshold alarms. This service delivers flow logs to an S3 bucket.</p>
+</li>
+<li>
+<p>AWS Config with the conformance pack for HIPAA, maps HIPAA requirements to AWS configuration items. This service delivers flow logs to an S3 bucket.</p>
+</li>
+<li>
+<p>AWS CloudTrail for AWS access logging. This service delivers flow logs to an S3 bucket.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>For customer connectivity:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>AWS Site-to-Site VPN or AWS Direct Connect to connect with AWS Transit Gateway.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>For access control and alerting:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Amazon Simple Notification Service (Amazon SNS) for sending email alerts from alarms.</p>
+</li>
+<li>
+<p>AWS Identity and Access Management (IAM) for access control and authorization.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1039,8 +1116,7 @@ and <a href="https://aws.amazon.com/training/" target="_blank" rel="noopener">AW
 deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start assumes familiarity with basic concepts in the areas of networking, configuration management, and data encryption.
-This deployment guide also requires a moderate level of familiarity with AWS services. If you’re new to AWS, visit the <a href="https://aws.amazon.com/getting-started/">Getting Started Resource Center</a> and the <a href="https://aws.amazon.com/training/">AWS Training and Certification website</a>. These sites provide materials for learning how to design, deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
+<p>This Quick Start also assumes familiarity with basic concepts in the areas of networking, configuration management, and data encryption.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1060,7 +1136,7 @@ This deployment guide also requires a moderate level of familiarity with AWS ser
 <div class="sect3">
 <h4 id="_resource_quotas">Resource quotas</h4>
 <div class="paragraph">
-<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might request quota increases to avoid exceeding the default limits for any resources that are shared across multiple deployments. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
+<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1083,19 +1159,19 @@ This deployment guide also requires a moderate level of familiarity with AWS ser
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 Buckets</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 buckets</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Identity and Access Management (IAM) roles</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IAM roles</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Identity and Access Management (IAM) Instance Profiles</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IAM instance profile</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Simple Notification Service (SNS) Topics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SNS topic</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 </tbody>
@@ -1104,7 +1180,7 @@ This deployment guide also requires a moderate level of familiarity with AWS ser
 <div class="sect3">
 <h4 id="_supported_regions">Supported Regions</h4>
 <div class="paragraph">
-<p>This Quick Start supports the following Regions:</p>
+<p>This Quick Start supports the following AWS Regions.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1115,7 +1191,7 @@ This deployment guide also requires a moderate level of familiarity with AWS ser
 <p>us-east-2, US East (Ohio)</p>
 </li>
 <li>
-<p>us-west-1, US West (California)</p>
+<p>us-west-1, US West (N. California)</p>
 </li>
 <li>
 <p>us-west-2, US West (Oregon)</p>
@@ -1180,7 +1256,20 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 <div class="sect3">
 <h4 id="_prepare_for_the_deployment">Prepare for the deployment</h4>
 <div class="paragraph">
-<p>Ensure that at least one Amazon IAM Service Linked Role for AWS Config exists in your AWS account where you plan to deploy the Quick Start. Make note of the Amazon Resource Name (ARN). You need it during deployment. To create the service linked role, follow the <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html">instructions in the AWS documentation</a> and using <a href="https://docs.aws.amazon.com/config/latest/developerguide/iamrole-permissions.html">AWS Config Role Requirements</a>.</p>
+<p>Ensure that at least one Amazon IAM service-linked role for AWS Config exists in your AWS account where you plan to deploy the Quick Start. Make note of the Amazon Resource Name (ARN). You need it during deployment.</p>
+</div>
+<div class="paragraph">
+<p>For more information:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html" target="_blank" rel="noopener">Creating a role to delegate permissions to an AWS service</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/config/latest/developerguide/iamrole-permissions.html" target="_blank" rel="noopener">Permissions for the IAM role assigned to AWS Config</a></p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
@@ -1191,9 +1280,13 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Deploy Reference Architecture for HIPAA into a new VPC</strong>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys Reference Architecture for HIPAA into this new VPC.</p>
+<p><strong>Deploy HIPAA Reference Architecture.</strong>
+This option builds a new AWS environment consisting of a new VPC, subnets, NAT gateways, security groups, and other infrastructure components. It then deploys HIPAA Reference Architecture into this VPC.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>The Quick Start provides one template for both of these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and HIPAA Reference Architecture settings, as discussed later in this guide.</p>
 </div>
 </div>
 </div>
@@ -1217,59 +1310,42 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 </div>
 <div class="sect2">
 <h3 id="_launch_the_quick_start">Launch the Quick Start</h3>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-You are responsible for the cost of the AWS services used while running this Quick Start reference deployment. There is no additional cost for using this Quick Start. For full details, see the pricing pages for each AWS service used by this Quick Start. Prices are subject to change.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
-<p>Each deployment takes about 15 minutes / 60 minutes / 1.5 hours to complete.</p>
+<p>Each deployment takes about 15 minutes to complete.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
 <p>Sign in to your AWS account, and choose one of the following options to launch the AWS CloudFormation template. For help with choosing an option, see <a href="#_deployment_options">Deployment options</a> earlier in this guide.</p>
-</li>
-</ol>
-</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 75%;">
+<col style="width: 25%;">
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_launch_permalink" target="_blank" rel="noopener">Deploy Reference Architecture for HIPAA into a new VPC on AWS</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_template_permalink" target="_blank" rel="noopener">View template</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://fwd.aws/NQpbK?" target="_blank" rel="noopener">Launch the Quick Start</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://fwd.aws/54z9P?" target="_blank" rel="noopener">View template</a></p></td>
 </tr>
 </tbody>
 </table>
-<div class="olist arabic">
-<ol class="arabic" start="2">
-<li>
-<p>Check the AWS Region that’s displayed in the upper-right corner of the navigation bar, and change it if necessary. This Region is where the network infrastructure for Reference Architecture for HIPAA is built. The template is launched in the us-east-1 Region by default.</p>
 </li>
-</ol>
+<li>
+<p>Check the AWS Region that&#8217;s displayed in the upper-right corner of the navigation bar. This Region is where you build the network infrastructure.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The template launches in us-east-1 by default. Change it if necessary.</p>
+</li>
+</ul>
 </div>
-<div class="olist arabic">
-<ol class="arabic" start="3">
+</li>
 <li>
 <p>On the <strong>Create stack</strong> page, keep the default setting for the template URL, and then choose <strong>Next</strong>.</p>
 </li>
 <li>
 <p>On the <strong>Specify stack details</strong> page, change the stack name if needed. Review the parameters for the template. Provide values for the parameters that require input. For all other parameters, review the default settings and customize them as necessary. For details on each parameter, see the <a href="#_parameter_reference">Parameter reference</a> section of this guide. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
 </li>
-</ol>
-</div>
-<div class="olist arabic">
-<ol class="arabic" start="5">
 <li>
 <p>On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.</p>
 </li>
@@ -1280,73 +1356,108 @@ You are responsible for the cost of the AWS services used while running this Qui
 <p>Choose <strong>Create stack</strong> to deploy the stack.</p>
 </li>
 <li>
-<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Reference Architecture for HIPAA deployment is ready.</p>
+<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the HIPAA Reference Architecture deployment is ready.</p>
 </li>
 <li>
-<p>Use the values displayed in the <strong>Outputs</strong> tab for the stack, as shown in <a href="#cfn_outputs">Figure 2</a>, to view the created resources.</p>
+<p>To view the created resources, see the values displayed in the <strong>Outputs</strong> tab for the stack.</p>
 </li>
 </ol>
 </div>
-<div id="cfn_outputs" class="imageblock">
-<div class="content">
-<a class="image" href="images/cfn_outputs.png"><img src="images/cfn_outputs.png" alt="cfn_outputs" width="100%" height="100%"></a>
-</div>
-<div class="title">Figure 2. Reference Architecture for HIPAA outputs after successful deployment</div>
-</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_security">Security</h2>
+<h2 id="_resources">Resources</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a href="https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-egress-to-internet.html">Centralized Internet Egress Documentation</a><br>
-<a href="https://aws.amazon.com/blogs/networking-and-content-delivery/creating-a-single-internet-exit-point-from-multiple-vpcs-using-aws-transit-gateway/">Creating a single internet exit point from multiple VPCs Using AWS Transit Gateway</a><br>
-<a href="https://docs.aws.amazon.com/config/latest/developerguide/operational-best-practices-for-hipaa_security.html">AWS Config Conformance Pack for HIPAA</a><br>
-<a href="https://docs.aws.amazon.com/config/latest/developerguide/conformancepack-sample-templates.html">AWS Config Conformance Pack Full List</a><br></p>
+<p><strong>AWS security:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-egress-to-internet.html" target="_blank" rel="noopener">Centralized egress to internet</a></p>
+</li>
+<li>
+<p><a href="https://aws.amazon.com/blogs/networking-and-content-delivery/creating-a-single-internet-exit-point-from-multiple-vpcs-using-aws-transit-gateway/" target="_blank" rel="noopener">Creating a single internet exit point from multiple VPCs using AWS Transit Gateway</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/config/latest/developerguide/operational-best-practices-for-hipaa_security.html" target="_blank" rel="noopener">Operational Best Practices for HIPAA Security</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/config/latest/developerguide/conformancepack-sample-templates.html" target="_blank" rel="noopener">Conformance Pack Sample Templates</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>AWS resources:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://aws.amazon.com/getting-started/" target="_blank" rel="noopener">Getting Started with AWS</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/general/latest/gr/" target="_blank" rel="noopener">AWS General Reference</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/general/latest/gr/glos-chap.html" target="_blank" rel="noopener">AWS glossary</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>AWS services:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.aws.amazon.com/cloudformation/" target="_blank" rel="noopener">AWS CloudFormation Documentation</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html" target="_blank" rel="noopener">What Is AWS CloudTrail?</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html" target="_blank" rel="noopener">What Is Amazon CloudWatch?</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html" target="_blank" rel="noopener">What Is AWS Config?</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/user-guide/what-is-s3.html" target="_blank" rel="noopener">What is Amazon S3?</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/iam/" target="_blank" rel="noopener">AWS Identity and Access Management Documentation</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/vpc/" target="_blank" rel="noopener">Amazon Virtual Private Cloud Documentation</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>HIPAA:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://aws.amazon.com/compliance/hipaa-compliance/" target="_blank" rel="noopener">HIPAA Compliance</a> (AWS website)</p>
+</li>
+<li>
+<p><a href="https://aws.amazon.com/artifact/getting-started/#BAA_Agreements" target="_blank" rel="noopener">Getting Started with AWS Artifact</a></p>
+</li>
+<li>
+<p><a href="https://d0.awsstatic.com/whitepapers/compliance/AWS_HIPAA_Compliance_Whitepaper.pdf" target="_blank" rel="noopener">Architecting for HIPAA Security and Compliance on Amazon Web Services</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_additional_resources">Additional Resources</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>AWS resources<br>
-- <a href="https://aws.amazon.com/getting-started/">Getting Started Resource Center</a><br>
-- <a href="https://docs.aws.amazon.com/general/latest/gr/">AWS General Reference</a><br>
-- <a href="https://docs.aws.amazon.com/general/latest/gr/glos-chap.html">AWS Glossary</a><br></p>
-</div>
-<div class="paragraph">
-<p>AWS services<br>
-- <a href="https://docs.aws.amazon.com/cloudformation/">AWS CloudFormation</a><br>
-- <a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html">AWS CloudTrail</a><br>
-- <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html">Amazon CloudWatch</a><br>
-- <a href="https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html">AWS Config</a><br>
-- <a href="https://docs.aws.amazon.com/AmazonS3/latest/user-guide/what-is-s3.html">Amazon Simple Storage Service</a><br>
-- <a href="https://docs.aws.amazon.com/iam/">IAM</a><br>
-- <a href="https://docs.aws.amazon.com/vpc/">Amazon VPC</a></p>
-</div>
-<div class="paragraph">
-<p>HIPAA<br>
-- <a href="https://aws.amazon.com/compliance/hipaa-compliance/">HIPAA Compliance page on the AWS website</a><br>
-- <a href="https://aws.amazon.com/artifact/getting-started/#BAA_Agreements">Step-by-step guide to accepting the AWS Business Associate Addendum on AWS Artifact</a><br>
-- <a href="https://d0.awsstatic.com/whitepapers/compliance/AWS_HIPAA_Compliance_Whitepaper.pdf">AWS Whitepaper: Architecting for HIPAA Security and Compliance on Amazon Web Services</a><br>
-- <a href="https://www.hhs.gov/hipaa/for-professionals/index.html">U.S. Department of Health &amp; Human Services (HHS) HIPAA website</a></p>
-</div>
-<div class="paragraph">
-<p>Other Quick Start reference deployments<br>
-- <a href="https://aws.amazon.com/quickstart/">AWS Quick Start home page</a></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_troubleshooting">Troubleshooting</h2>
+<h2 id="_faq">FAQ</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><strong>Q.</strong> I encountered a <strong>CREATE_FAILED</strong> error when I launched the Quick Start.</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> If AWS CloudFormation fails to create the stack, relaunch the template with <strong>Rollback on failure</strong> set to <strong>Disabled</strong>. This setting is under <strong>Advanced</strong> in the AWS CloudFormation console on the <strong>Configure stack options</strong> page. With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue. (For Windows, look at the log files in <code>%ProgramFiles%\Amazon\EC2ConfigService</code> and <code>C:\cfn\log</code>.)</p>
+<p><strong>A.</strong> If AWS CloudFormation fails to create the stack, relaunch the template with <strong>Rollback on failure</strong> set to <strong>Disabled</strong>. This setting is under <strong>Advanced</strong> in the AWS CloudFormation console on the <strong>Configure stack options</strong> page. With this setting, the stack&#8217;s state is retained, and the instance keeps running so that you can troubleshoot the issue.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -1364,10 +1475,10 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <p>For more information, see <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html" target="_blank" rel="noopener">Troubleshooting AWS CloudFormation</a>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Q.</strong> I encountered a size limitation error when I deployed the AWS CloudFormation templates.</p>
+<p><strong>Q.</strong> I encountered a size-limitation error when I deployed the AWS CloudFormation templates.</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information, see <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html" target="_blank" rel="noopener">AWS CloudFormation quotas</a>.</p>
+<p><strong>A.</strong> Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template-size limitations. For more information, see <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html" target="_blank" rel="noopener">AWS CloudFormation quotas</a>.</p>
 </div>
 </div>
 </div>
@@ -1381,16 +1492,15 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Unless you are customizing the Quick Start templates for your own deployment projects, we recommend that you keep the default settings for the parameters labeled <code>Quick Start S3 bucket name</code>, <code>Quick Start S3 bucket
-Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parameter settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.
+Unless you are customizing the Quick Start templates for your own deployment projects, keep the default settings for the parameters labeled <strong>Quick Start S3 bucket name</strong>, <strong>Quick Start S3 bucket Region</strong>, and <strong>Quick Start S3 key prefix</strong>. Changing these parameter settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.
 </td>
 </tr>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_launch_into_an_existing_vpc">Launch into an existing VPC</h3>
+<h3 id="_parameters_for_deploying_hipaa_reference_architecture">Parameters for deploying HIPAA Reference Architecture</h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. AWS config configuration</caption>
+<caption class="title">Table 1. AWS Config configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1405,22 +1515,22 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS config service linked role ARN
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Config service-linked-role ARN
 (<code>AWSConfigARN</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS config service linked role ARN.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon Resource Name for the AWS Config service-linked role.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS config recorder
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Config recorder
 (<code>CreateConfigRecorder</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Yes</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose "No" if you already used AWS Config in this region.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose "No" if you&#8217;ve already used AWS Config in this Region.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS config delivery channel
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Config delivery channel
 (<code>CreateConfigDeliveryChannel</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Yes</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose "No" if you already used AWS Config in this region.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose "No" if you&#8217;ve already used AWS Config in this Region.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1440,34 +1550,34 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CloudWatch alarm notification email address
+<td class="tableblock halign-left valign-top"><p class="tableblock">SNS alarm-notification email address
 (<code>SNSAlarmEmail</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SNS security alarm email.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon SNS notification email address for CloudWatch alarms.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 lifecycle expiration days
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 Lifecycle expiration days
 (<code>LifecycleExpirationDays</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>2555</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lifecycle expiration days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days after objects are created that Amazon S3 automatically deletes them.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 lifecycle transition to standard-IA days
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 Lifecycle transition-to-standard-IA days
 (<code>LifecycleTransitionStandardIADays</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>90</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lifecycle transition standard-IA days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days after objects are created that Amazon S3 automatically transitions them to the S3 Standard-IA storage class.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 lifecycle transition to glacier days
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 Lifecycle transition-to-S3-Glacier days
 (<code>LifecycleTransitionGlacierDays</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>180</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lifecycle transition glacier days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days after objects are created that Amazon S3 automatically transitions them to the S3 Glacier storage class.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CloudTrail retention days
+<td class="tableblock halign-left valign-top"><p class="tableblock">CloudTrail log-retention days
 (<code>CloudTrailLogRetentionDays</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>90</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CloudTrail log group retention days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days that CloudTrail logs are retained.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1490,25 +1600,25 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC CIDR block
 (<code>DevVPCCIDRBlock</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.18.0.0/16</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC CIDR block.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the development VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development Subnet 1 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC subnet 1 CIDR block
 (<code>DevVPCSubnet1</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.18.11.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC Subnet 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for subnet 1 in the development VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development Subnet 2 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC subnet 2 CIDR block
 (<code>DevVPCSubnet2</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.18.12.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC Subnet 2.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for subnet 2 in the development VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC log group retention days
+<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC flow-log log-group retention
 (<code>DevVPCFlowLogLogGroupRetention</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>90</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Development VPC flow logs log group retention days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days that the flow-log log group is retained for the development VPC.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1531,25 +1641,25 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC CIDR block
 (<code>ProdVPCCIDRBlock</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.17.0.0/16</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC CIDR block.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the production VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production Subnet 1 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Production subnet 1 CIDR block
 (<code>ProdVPCSubnet1</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.17.11.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC Subnet 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for subnet 1 in the production VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production Subnet 2 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Production subnet 2 CIDR block
 (<code>ProdVPCSubnet2</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.17.12.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC Subnet 2.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for subnet 2 in the production VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC log group retention days
+<td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC flow-log log-group retention
 (<code>ProdVPCFlowLogLogGroupRetention</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>90</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Production VPC flow logs log group retention days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days that the flow-log log group is retained for the production VPC.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1572,42 +1682,42 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC CIDR block
 (<code>MgmtVPCCIDRBlock</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.16.0.0/16</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC CIDR block.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the management VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management public Subnet 1 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Management public subnet 1 CIDR block
 (<code>MgmtVPCPublicSubnet1</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.16.1.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC public subnet 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for public subnet 1 in the management VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management public Subnet 2 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Management public subnet 2 CIDR block
 (<code>MgmtVPCPublicSubnet2</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.16.2.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC public subnet 2.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for public subnet 2 in the management VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management private Subnet 1 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Management private subnet 1 CIDR block
 (<code>MgmtVPCPrivateSubnet1</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.16.11.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC private subnet 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 in the management VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management private Subnet 2 CIDR block
+<td class="tableblock halign-left valign-top"><p class="tableblock">Management private subnet 2 CIDR block
 (<code>MgmtVPCPrivateSubnet2</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>172.16.12.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC private subnet 2.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 in the management VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC log group retention days
+<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC flow-log log-group retention
 (<code>MgmtVPCFlowLogLogGroupRetention</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>90</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Management VPC flow logs log group retention days.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of days that the flow-log log group is retained for the management VPC.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. AWS quick start configuration</caption>
+<caption class="title">Table 6. AWS Quick Start configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1625,19 +1735,19 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket name
 (<code>QSS3BucketName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket region
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket Region
 (<code>QSS3BucketRegion</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 key prefix
 (<code>QSS3KeyPrefix</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-compliance-hipaa/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. See <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1685,8 +1795,15 @@ and to share your customizations with others.</p>
 </div>
 <p class="footer-text">
 <!-- We can use document attributes: -->
-<!-- Generated with Asciidoctor v2.0.12. -->
-<a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2021, Amazon Web Services, Inc. or its affiliates and Amazon Web Services. All rights reserved.
+<!-- Generated with Asciidoctor v2.0.15. -->
+<a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2021, Amazon Web Services, Inc. or its affiliates. All rights reserved.
 </p>
 </body>
 </html>
+<!--
+repo commit:
+3820db774d4ce263be2c8e424bd80ae2acba4374
+
+submodule config:
++a9d6c5903745c1091793d3cd1f960948919c2c9f docs/boilerplate (heads/main)
+-->

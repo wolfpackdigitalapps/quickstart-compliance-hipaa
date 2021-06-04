@@ -12,43 +12,33 @@
 
 // _Add any best practices for using the software._
 
-== Security
-// Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
+== Resources
 
-https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-egress-to-internet.html[Centralized Internet Egress Documentation] +
-https://aws.amazon.com/blogs/networking-and-content-delivery/creating-a-single-internet-exit-point-from-multiple-vpcs-using-aws-transit-gateway/[Creating a single internet exit point from multiple VPCs Using AWS Transit Gateway] +
-https://docs.aws.amazon.com/config/latest/developerguide/operational-best-practices-for-hipaa_security.html[AWS Config Conformance Pack for HIPAA] +
-https://docs.aws.amazon.com/config/latest/developerguide/conformancepack-sample-templates.html[AWS Config Conformance Pack Full List] +
+*AWS security:*
 
-// == Other useful information
-//Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
+* https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-egress-to-internet.html[Centralized egress to internet^]
+* https://aws.amazon.com/blogs/networking-and-content-delivery/creating-a-single-internet-exit-point-from-multiple-vpcs-using-aws-transit-gateway/[Creating a single internet exit point from multiple VPCs using AWS Transit Gateway^]
+* https://docs.aws.amazon.com/config/latest/developerguide/operational-best-practices-for-hipaa_security.html[Operational Best Practices for HIPAA Security^]
+* https://docs.aws.amazon.com/config/latest/developerguide/conformancepack-sample-templates.html[Conformance Pack Sample Templates^]
 
-== Additional Resources
+*AWS resources:*
 
-AWS resources + 
-- https://aws.amazon.com/getting-started/[Getting Started Resource Center] +
-- https://docs.aws.amazon.com/general/latest/gr/[AWS General Reference] +
-- https://docs.aws.amazon.com/general/latest/gr/glos-chap.html[AWS Glossary] +
-[%hardbreaks]
+* https://aws.amazon.com/getting-started/[Getting Started with AWS^]
+* https://docs.aws.amazon.com/general/latest/gr/[AWS General Reference^]
+* https://docs.aws.amazon.com/general/latest/gr/glos-chap.html[AWS glossary^]
 
-AWS services + 
-- https://docs.aws.amazon.com/cloudformation/[AWS CloudFormation] + 
-- https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html[AWS CloudTrail] + 
-- https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html[Amazon CloudWatch] +
-- https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html[AWS Config] +
-- https://docs.aws.amazon.com/AmazonS3/latest/user-guide/what-is-s3.html[Amazon Simple Storage Service] +
-- https://docs.aws.amazon.com/iam/[IAM] +
-- https://docs.aws.amazon.com/vpc/[Amazon VPC]
-[%hardbreaks]
+*AWS services:*
 
-HIPAA +
-- https://aws.amazon.com/compliance/hipaa-compliance/[HIPAA Compliance page on the AWS website] +
-- https://aws.amazon.com/artifact/getting-started/#BAA_Agreements[Step-by-step guide to accepting the AWS Business Associate Addendum on AWS Artifact] +
-- https://d0.awsstatic.com/whitepapers/compliance/AWS_HIPAA_Compliance_Whitepaper.pdf[AWS Whitepaper: Architecting for HIPAA Security and Compliance on Amazon Web Services] +
-- https://www.hhs.gov/hipaa/for-professionals/index.html[U.S. Department of Health & Human Services (HHS) HIPAA website]
-[%hardbreaks]
+* https://docs.aws.amazon.com/cloudformation/[AWS CloudFormation Documentation^]
+* https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html[What Is AWS CloudTrail?^] 
+* https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html[What Is Amazon CloudWatch?^]
+* https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html[What Is AWS Config?^]
+* https://docs.aws.amazon.com/AmazonS3/latest/user-guide/what-is-s3.html[What is Amazon S3?^]
+* https://docs.aws.amazon.com/iam/[AWS Identity and Access Management Documentation^]
+* https://docs.aws.amazon.com/vpc/[Amazon Virtual Private Cloud Documentation^]
 
-Other Quick Start reference deployments +
-- https://aws.amazon.com/quickstart/[AWS Quick Start home page]
-[%hardbreaks]
+*HIPAA:*
 
+* https://aws.amazon.com/compliance/hipaa-compliance/[HIPAA Compliance^] (AWS website)
+* https://aws.amazon.com/artifact/getting-started/#BAA_Agreements[Getting Started with AWS Artifact^]
+* https://d0.awsstatic.com/whitepapers/compliance/AWS_HIPAA_Compliance_Whitepaper.pdf[Architecting for HIPAA Security and Compliance on Amazon Web Services^]

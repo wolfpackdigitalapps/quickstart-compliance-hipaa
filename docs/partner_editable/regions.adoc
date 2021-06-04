@@ -1,8 +1,9 @@
-This Quick Start supports the following Regions:
+This Quick Start supports the following AWS Regions.
+//, including an https://aws.amazon.com/govcloud-us/[AWS GovCloud (US)^] Region: 
 
 * us-east-1, US East (N. Virginia)
 * us-east-2, US East (Ohio)
-* us-west-1, US West (California)
+* us-west-1, US West (N. California)
 * us-west-2, US West (Oregon)
 * ca-central-1, Canada (Central)
 * eu-central-1, Europe (Frankfurt)
@@ -16,5 +17,4 @@ This Quick Start supports the following Regions:
 * ap-southeast-1, Asia Pacific (Singapore)
 * ap-southeast-2, Asia Pacific (Sydney)
 * sa-east-1, South America (São Paulo)
-
-//Full list: https://docs.aws.amazon.com/general/latest/gr/rande.html
+//* AWS GovCloud (US-West)

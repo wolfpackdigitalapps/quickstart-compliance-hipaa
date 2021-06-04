@@ -1,56 +1,56 @@
 
-.AWS config configuration
+.AWS Config configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|AWS config service linked role ARN
-(`AWSConfigARN`)|`**__Blank string__**`|AWS config service linked role ARN.|AWS config recorder
-(`CreateConfigRecorder`)|`Yes`|Choose "No" if you already used AWS Config in this region.|AWS config delivery channel
-(`CreateConfigDeliveryChannel`)|`Yes`|Choose "No" if you already used AWS Config in this region.
+|Parameter label (name) |Default value|Description|AWS Config service-linked-role ARN
+(`AWSConfigARN`)|`**__Blank string__**`|Amazon Resource Name for the AWS Config service-linked role.|AWS Config recorder
+(`CreateConfigRecorder`)|`Yes`|Choose "No" if you've already used AWS Config in this Region.|AWS Config delivery channel
+(`CreateConfigDeliveryChannel`)|`Yes`|Choose "No" if you've already used AWS Config in this Region.
 |===
 .AWS logging configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|CloudWatch alarm notification email address
-(`SNSAlarmEmail`)|`**__Blank string__**`|SNS security alarm email.|S3 lifecycle expiration days
-(`LifecycleExpirationDays`)|`2555`|Lifecycle expiration days.|S3 lifecycle transition to standard-IA days
-(`LifecycleTransitionStandardIADays`)|`90`|Lifecycle transition standard-IA days.|S3 lifecycle transition to glacier days
-(`LifecycleTransitionGlacierDays`)|`180`|Lifecycle transition glacier days.|CloudTrail retention days
-(`CloudTrailLogRetentionDays`)|`90`|CloudTrail log group retention days.
+|Parameter label (name) |Default value|Description|SNS alarm-notification email address
+(`SNSAlarmEmail`)|`**__Blank string__**`|Amazon SNS notification email address for CloudWatch alarms.|S3 Lifecycle expiration days
+(`LifecycleExpirationDays`)|`2555`|Number of days after objects are created that Amazon S3 automatically deletes them.|S3 Lifecycle transition-to-standard-IA days
+(`LifecycleTransitionStandardIADays`)|`90`|Number of days after objects are created that Amazon S3 automatically transitions them to the S3 Standard-IA storage class.|S3 Lifecycle transition-to-S3-Glacier days
+(`LifecycleTransitionGlacierDays`)|`180`|Number of days after objects are created that Amazon S3 automatically transitions them to the S3 Glacier storage class.|CloudTrail log-retention days
+(`CloudTrailLogRetentionDays`)|`90`|Number of days that CloudTrail logs are retained.
 |===
 .Development VPC configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Development VPC CIDR block
-(`DevVPCCIDRBlock`)|`172.18.0.0/16`|Development VPC CIDR block.|Development Subnet 1 CIDR block
-(`DevVPCSubnet1`)|`172.18.11.0/24`|Development VPC Subnet 1.|Development Subnet 2 CIDR block
-(`DevVPCSubnet2`)|`172.18.12.0/24`|Development VPC Subnet 2.|Development VPC log group retention days
-(`DevVPCFlowLogLogGroupRetention`)|`90`|Development VPC flow logs log group retention days.
+(`DevVPCCIDRBlock`)|`172.18.0.0/16`|CIDR block for the development VPC.|Development VPC subnet 1 CIDR block
+(`DevVPCSubnet1`)|`172.18.11.0/24`|CIDR block for subnet 1 in the development VPC.|Development VPC subnet 2 CIDR block
+(`DevVPCSubnet2`)|`172.18.12.0/24`|CIDR block for subnet 2 in the development VPC.|Development VPC flow-log log-group retention
+(`DevVPCFlowLogLogGroupRetention`)|`90`|Number of days that the flow-log log group is retained for the development VPC.
 |===
 .Production VPC configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Production VPC CIDR block
-(`ProdVPCCIDRBlock`)|`172.17.0.0/16`|Production VPC CIDR block.|Production Subnet 1 CIDR block
-(`ProdVPCSubnet1`)|`172.17.11.0/24`|Production VPC Subnet 1.|Production Subnet 2 CIDR block
-(`ProdVPCSubnet2`)|`172.17.12.0/24`|Production VPC Subnet 2.|Production VPC log group retention days
-(`ProdVPCFlowLogLogGroupRetention`)|`90`|Production VPC flow logs log group retention days.
+(`ProdVPCCIDRBlock`)|`172.17.0.0/16`|CIDR block for the production VPC.|Production subnet 1 CIDR block
+(`ProdVPCSubnet1`)|`172.17.11.0/24`|CIDR block for subnet 1 in the production VPC.|Production subnet 2 CIDR block
+(`ProdVPCSubnet2`)|`172.17.12.0/24`|CIDR block for subnet 2 in the production VPC.|Production VPC flow-log log-group retention
+(`ProdVPCFlowLogLogGroupRetention`)|`90`|Number of days that the flow-log log group is retained for the production VPC.
 |===
 .Management VPC configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Management VPC CIDR block
-(`MgmtVPCCIDRBlock`)|`172.16.0.0/16`|Management VPC CIDR block.|Management public Subnet 1 CIDR block
-(`MgmtVPCPublicSubnet1`)|`172.16.1.0/24`|Management VPC public subnet 1.|Management public Subnet 2 CIDR block
-(`MgmtVPCPublicSubnet2`)|`172.16.2.0/24`|Management VPC public subnet 2.|Management private Subnet 1 CIDR block
-(`MgmtVPCPrivateSubnet1`)|`172.16.11.0/24`|Management VPC private subnet 1.|Management private Subnet 2 CIDR block
-(`MgmtVPCPrivateSubnet2`)|`172.16.12.0/24`|Management VPC private subnet 2.|Management VPC log group retention days
-(`MgmtVPCFlowLogLogGroupRetention`)|`90`|Management VPC flow logs log group retention days.
+(`MgmtVPCCIDRBlock`)|`172.16.0.0/16`|CIDR block for the management VPC.|Management public subnet 1 CIDR block
+(`MgmtVPCPublicSubnet1`)|`172.16.1.0/24`|CIDR block for public subnet 1 in the management VPC.|Management public subnet 2 CIDR block
+(`MgmtVPCPublicSubnet2`)|`172.16.2.0/24`|CIDR block for public subnet 2 in the management VPC.|Management private subnet 1 CIDR block
+(`MgmtVPCPrivateSubnet1`)|`172.16.11.0/24`|CIDR block for private subnet 1 in the management VPC.|Management private subnet 2 CIDR block
+(`MgmtVPCPrivateSubnet2`)|`172.16.12.0/24`|CIDR block for private subnet 2 in the management VPC.|Management VPC flow-log log-group retention
+(`MgmtVPCFlowLogLogGroupRetention`)|`90`|Number of days that the flow-log log group is retained for the management VPC.
 |===
-.AWS quick start configuration
+.AWS Quick Start configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Quick Start S3 bucket name
-(`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 bucket region
-(`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 key prefix
-(`QSS3KeyPrefix`)|`quickstart-compliance-hipaa/`|S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+(`QSS3BucketName`)|`aws-quickstart`|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). See https://aws-quickstart.github.io/option1.html.|Quick Start S3 bucket Region
+(`QSS3BucketRegion`)|`us-east-1`|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See https://aws-quickstart.github.io/option1.html.|Quick Start S3 key prefix
+(`QSS3KeyPrefix`)|`quickstart-compliance-hipaa/`|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |===

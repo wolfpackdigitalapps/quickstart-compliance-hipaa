@@ -1,14 +1,9 @@
-// If no preperation is required, remove all content from here
-
-// ==== Prepare your AWS account
-
-// _Describe any setup required in the AWS account prior to template launch_
-
-// ==== Prepare your {partner-company-name} account
-
-// _Describe any setup required in the partner portal/account prior to template launch_
-
 ==== Prepare for the deployment
 
-Ensure that at least one Amazon IAM Service Linked Role for AWS Config exists in your AWS account where you plan to deploy the Quick Start. Make note of the Amazon Resource Name (ARN). You need it during deployment. To create the service linked role, follow the https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html[instructions in the AWS documentation] and using https://docs.aws.amazon.com/config/latest/developerguide/iamrole-permissions.html[AWS Config Role Requirements].
+Ensure that at least one Amazon IAM service-linked role for AWS Config exists in your AWS account where you plan to deploy the Quick Start. Make note of the Amazon Resource Name (ARN). You need it during deployment. 
+
+For more information:
+
+* https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html[Creating a role to delegate permissions to an AWS service^]
+* https://docs.aws.amazon.com/config/latest/developerguide/iamrole-permissions.html[Permissions for the IAM role assigned to AWS Config^]
 
