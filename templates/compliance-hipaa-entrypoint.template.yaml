@@ -59,7 +59,6 @@ Metadata:
       Parameters:
       - QSS3BucketName
       - QSS3BucketRegion
-      - QSS3KeyPrefix
     ParameterLabels:
       AWSConfigARN:
         default: AWS Config service-linked-role ARN
@@ -109,8 +108,6 @@ Metadata:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
         default: Quick Start S3 bucket Region
-      QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
 Parameters:
   AWSConfigARN:
     Type: String
@@ -223,20 +220,6 @@ Parameters:
     When using your own bucket, specify the Region. 
     See https://aws-quickstart.github.io/option1.html.'
     Type: String
-  QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: The Quick Start S3 key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slashes (/). The prefix should
-      end with a forward slash (/).
-    Default: quickstart-compliance-hipaa/
-    Description: S3 key prefix that is used to simulate a directory for your copy of the 
-      Quick Start assets. Keep the default prefix unless you are customizing 
-      the template. Changing this prefix updates code references to point to 
-      a new Quick Start location. This prefix can include numbers, lowercase 
-      letters, uppercase letters, hyphens (-), and forward slashes (/). End with 
-      a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html 
-      and https://aws-quickstart.github.io/option1.html.
-    Type: String
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
@@ -245,27 +228,24 @@ Resources:
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-config.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/templates/compliance-hipaa-config.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
         AWSConfigARN: !Ref AWSConfigARN
         CreateConfigRecorder: !Ref CreateConfigRecorder
         CreateConfigDeliveryChannel: !Ref CreateConfigDeliveryChannel
         QSS3BucketName: !Ref QSS3BucketName
-        QSS3KeyPrefix: !Ref QSS3KeyPrefix
   LogStack:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: ConfigStack
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-logging.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/templates/compliance-hipaa-logging.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
         SNSAlarmEmail: !Ref SNSAlarmEmail
@@ -279,10 +259,9 @@ Resources:
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-stg.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/templates/compliance-hipaa-stg.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
         StgVPCCIDRBlock: !Ref StgVPCCIDRBlock
@@ -295,10 +274,9 @@ Resources:
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-prod.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/templates/compliance-hipaa-prod.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
         ProdVPCCIDRBlock: !Ref ProdVPCCIDRBlock
@@ -311,10 +289,9 @@ Resources:
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-management.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/templates/compliance-hipaa-management.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
         MgmtVPCCIDRBlock: !Ref MgmtVPCCIDRBlock
@@ -328,10 +305,9 @@ Resources:
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-transit-gateway.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/templates/compliance-hipaa-transit-gateway.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
         StgVPCCIDRBlock: !Ref StgVPCCIDRBlock

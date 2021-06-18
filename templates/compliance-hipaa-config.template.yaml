@@ -25,7 +25,6 @@ Metadata:
         default: AWS quick-start configuration
       Parameters:
       - QSS3BucketName
-      - QSS3KeyPrefix
     ParameterLabels:
       AWSConfigARN:
         default: AWS config service linked role ARN
@@ -35,8 +34,6 @@ Metadata:
         default: AWS config delivery channel
       QSS3BucketName:
         default: Quick Start S3 bucket name
-      QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
 Parameters:
   AWSConfigARN:
     Type: String
@@ -60,15 +57,6 @@ Parameters:
     Description: S3 bucket name for the Quick Start assets. Quick Start bucket name
       can include numbers, lowercase letters, uppercase letters, and hyphens (-).
       It cannot start or end with a hyphen (-).
-    Type: String
-  QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
-    Default: quickstart-compliance-hipaa/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
     Type: String
 Conditions:
   CreateConfigRecorderYes: !Equals [!Ref CreateConfigRecorder, 'Yes']
@@ -154,16 +142,8 @@ Resources:
     Properties:
       ConformancePackName: aws-config-hipaa-conformance-pack
       TemplateS3Uri: !Sub
-      - 's3://${S3Bucket}/${QSS3KeyPrefix}templates/hipaa/Operational-Best-Practices-for-HIPAA-Security.yaml'
+      - 's3://${S3Bucket}/templates/hipaa/Operational-Best-Practices-for-HIPAA-Security.yaml'
       - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-        QSS3KeyPrefix: !Ref QSS3KeyPrefix
-#      TemplateS3Uri: !Join
-#        - ''
-#        - - 's3://'
-#          - !Ref QSS3BucketName
-#          - '/'
-#          - !Ref QSS3KeyPrefix
-#          - 'templates/hipaa/Operational-Best-Practices-for-HIPAA-Security.yaml'
   ConfigurationRecorder:
     Type: Custom::CreateConfigRecorder
     Condition: CreateConfigRecorderAutoDetect
