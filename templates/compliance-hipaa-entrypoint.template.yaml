@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Provisions HIPAA Ready Environment in AWS (qs-1qtukbnsl)
+Description: Provisions HIPAA Ready Environment in AWS
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "Parameters for deploying HIPAA Reference Architecture"
@@ -32,12 +32,12 @@ Metadata:
       - LifecycleTransitionGlacierDays
       - CloudTrailLogRetentionDays
     - Label:
-        default: Development VPC configuration
+        default: Staging VPC configuration
       Parameters:
-      - DevVPCCIDRBlock
-      - DevVPCSubnet1
-      - DevVPCSubnet2
-      - DevVPCFlowLogLogGroupRetention
+      - StgVPCCIDRBlock
+      - StgVPCSubnet1
+      - StgVPCSubnet2
+      - StgVPCFlowLogLogGroupRetention
     - Label:
         default: Production VPC configuration
       Parameters:
@@ -77,14 +77,14 @@ Metadata:
         default: S3 Lifecycle transition-to-S3-Glacier days
       CloudTrailLogRetentionDays:
         default: CloudTrail log-retention days
-      DevVPCCIDRBlock:
-        default: Development VPC CIDR block
-      DevVPCSubnet1:
-        default: Development VPC subnet 1 CIDR block
-      DevVPCSubnet2:
-        default: Development VPC subnet 2 CIDR block
-      DevVPCFlowLogLogGroupRetention:
-        default: Development VPC flow-log log-group retention
+      StgVPCCIDRBlock:
+        default: Staging VPC CIDR block
+      StgVPCSubnet1:
+        default: Staging VPC subnet 1 CIDR block
+      StgVPCSubnet2:
+        default: Staging VPC subnet 2 CIDR block
+      StgVPCFlowLogLogGroupRetention:
+        default: Staging VPC flow-log log-group retention
       ProdVPCCIDRBlock:
         default: Production VPC CIDR block
       ProdVPCSubnet1:
@@ -136,22 +136,22 @@ Parameters:
     Type: Number
     Default: 90
     Description: Number of days that CloudTrail logs are retained.
-  DevVPCCIDRBlock:
+  StgVPCCIDRBlock:
     Type: String
     Default: 172.18.0.0/16
-    Description: CIDR block for the development VPC.
-  DevVPCSubnet1:
+    Description: CIDR block for the Staging VPC.
+  StgVPCSubnet1:
     Type: String
     Default: 172.18.11.0/24
-    Description: CIDR block for subnet 1 in the development VPC.
-  DevVPCSubnet2:
+    Description: CIDR block for subnet 1 in the Staging VPC.
+  StgVPCSubnet2:
     Type: String
     Default: 172.18.12.0/24
-    Description: CIDR block for subnet 2 in the development VPC.
-  DevVPCFlowLogLogGroupRetention:
+    Description: CIDR block for subnet 2 in the Staging VPC.
+  StgVPCFlowLogLogGroupRetention:
     Type: Number
     Default: 90
-    Description: Number of days that the flow-log log group is retained for the development VPC.
+    Description: Number of days that the flow-log log group is retained for the Staging VPC.
   ProdVPCCIDRBlock:
     Type: String
     Default: 172.17.0.0/16
@@ -273,22 +273,22 @@ Resources:
         LifecycleTransitionStandardIADays: !Ref LifecycleTransitionStandardIADays
         LifecycleTransitionGlacierDays: !Ref LifecycleTransitionGlacierDays
         CloudTrailLogRetentionDays: !Ref CloudTrailLogRetentionDays
-  DevStack:
+  StgStack:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: [ ConfigStack, LogStack, MgmtStack ]
     Properties:
       TemplateURL: 
         !Sub 
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-dev.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/compliance-hipaa-stg.template.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
             QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
-        DevVPCCIDRBlock: !Ref DevVPCCIDRBlock
-        DevVPCSubnet1: !Ref DevVPCSubnet1
-        DevVPCSubnet2: !Ref DevVPCSubnet2
-        DevVPCFlowLogLogGroupRetention: !Ref DevVPCFlowLogLogGroupRetention
+        StgVPCCIDRBlock: !Ref StgVPCCIDRBlock
+        StgVPCSubnet1: !Ref StgVPCSubnet1
+        StgVPCSubnet2: !Ref StgVPCSubnet2
+        StgVPCFlowLogLogGroupRetention: !Ref StgVPCFlowLogLogGroupRetention
   ProdStack:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: [ ConfigStack, LogStack, MgmtStack ]
@@ -334,24 +334,24 @@ Resources:
             QSS3KeyPrefix: !Ref QSS3KeyPrefix
       TimeoutInMinutes: 60
       Parameters:
-        DevVPCCIDRBlock: !Ref DevVPCCIDRBlock
+        StgVPCCIDRBlock: !Ref StgVPCCIDRBlock
         ProdVPCCIDRBlock: !Ref ProdVPCCIDRBlock
-        DevelopmentVPC:
+        StagingVPC:
           Fn::GetAtt: 
-          - DevStack
-          - Outputs.DevelopmentVPC
-        DevelopmentVPCSubnet1:
+          - StgStack
+          - Outputs.StagingVPC
+        StagingVPCSubnet1:
           Fn::GetAtt: 
-          - DevStack
-          - Outputs.DevelopmentVPCSubnet1
-        DevelopmentVPCSubnet2:
+          - StgStack
+          - Outputs.StagingVPCSubnet1
+        StagingVPCSubnet2:
           Fn::GetAtt: 
-          - DevStack
-          - Outputs.DevelopmentVPCSubnet2
-        DevelopmentPrivateRouteTable1:
+          - StgStack
+          - Outputs.StagingVPCSubnet2
+        StagingPrivateRouteTable1:
           Fn::GetAtt: 
-          - DevStack
-          - Outputs.DevelopmentPrivateRouteTable1
+          - StgStack
+          - Outputs.StagingPrivateRouteTable1
         ProductionVPC:
           Fn::GetAtt: 
           - ProdStack

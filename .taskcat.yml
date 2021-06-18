@@ -10,7 +10,7 @@ project:
     SNSAlarmEmail: overridden
     CreateConfigRecorder: 'Yes'
     CreateConfigDeliveryChannel: 'Yes'
-    DevVPCFlowLogLogGroup: dev-flow-logs-group
+    StgVPCFlowLogLogGroup: stg-flow-logs-group
     ProdVPCFlowLogLogGroup: prod-flow-logs-group
     MgmtVPCFlowLogLogGroup: mgmt-flow-logs-group
     QSS3BucketName: $[taskcat_autobucket]

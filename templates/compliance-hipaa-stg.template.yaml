@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Provisions HIPAA Ready Environment in AWS - Dev (qs-1rabh51jr)
+Description: Provisions HIPAA Ready Environment in AWS - Stg
 Metadata:
   Identifier:
     Value: main
@@ -10,43 +10,43 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
-        default: Development VPC configuration
+        default: Staging VPC configuration
       Parameters:
-      - DevVPCCIDRBlock
-      - DevVPCSubnet1
-      - DevVPCSubnet2
-      - DevVPCFlowLogLogGroupRetention
+      - StgVPCCIDRBlock
+      - StgVPCSubnet1
+      - StgVPCSubnet2
+      - StgVPCFlowLogLogGroupRetention
     ParameterLabels:
-      DevVPCCIDRBlock:
-        default: Development VPC CIDR block
-      DevVPCSubnet1:
-        default: Development Subnet 1 CIDR block
-      DevVPCSubnet2:
-        default: Development Subnet 2 CIDR block
-      DevVPCFlowLogLogGroupRetention:
-        default: Development VPC log group retention days
+      StgVPCCIDRBlock:
+        default: Staging VPC CIDR block
+      StgVPCSubnet1:
+        default: Staging Subnet 1 CIDR block
+      StgVPCSubnet2:
+        default: Staging Subnet 2 CIDR block
+      StgVPCFlowLogLogGroupRetention:
+        default: Staging VPC log group retention days
 Parameters:
-  DevVPCCIDRBlock:
+  StgVPCCIDRBlock:
     Type: String
-    Description: Development VPC CIDR block.
+    Description: Staging VPC CIDR block.
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
-  DevVPCSubnet1:
+  StgVPCSubnet1:
     Type: String
-    Description: Development VPC private subnet 1.
+    Description: Staging VPC private subnet 1.
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
-  DevVPCSubnet2:
+  StgVPCSubnet2:
     Type: String
-    Description: Development VPC private subnet 2.
+    Description: Staging VPC private subnet 2.
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
-  DevVPCFlowLogLogGroupRetention:
+  StgVPCFlowLogLogGroupRetention:
     Type: String
-    Description: Development VPC flow logs log group retention days.
+    Description: Staging VPC flow logs log group retention days.
 Resources:
-  DevelopmentVPCFlowLogGroup:
+  StagingVPCFlowLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
-      RetentionInDays: !Ref DevVPCFlowLogLogGroupRetention
-  DevelopmentFlowLogsRole:
+      RetentionInDays: !Ref StgVPCFlowLogLogGroupRetention
+  StagingFlowLogsRole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -57,7 +57,7 @@ Resources:
             Principal:
               Service: vpc-flow-logs.amazonaws.com
             Action: 'sts:AssumeRole'
-      Description: Development Flow Logs Role
+      Description: Staging Flow Logs Role
       Path: /
       Policies:
         - PolicyDocument:
@@ -71,93 +71,93 @@ Resources:
                   - 'logs:DescribeLogGroups'
                   - 'logs:DescribeLogStreams'
                 Resource: '*'
-          PolicyName: Development-Flow-Logs-Role
+          PolicyName: Staging-Flow-Logs-Role
       Tags:
         - Key: Name
-          Value: Development VPC Flow Logs Role
+          Value: Staging VPC Flow Logs Role
         - Key: Purpose
           Value: Networking
-  DevVPC:
+  StgVPC:
     Type: 'AWS::EC2::VPC'
     Properties:
-      CidrBlock: !Ref DevVPCCIDRBlock
+      CidrBlock: !Ref StgVPCCIDRBlock
       EnableDnsHostnames: true
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: Development VPC
+          Value: Staging VPC
         - Key: Purpose
           Value: Networking
     DependsOn:
-      - DevelopmentVPCFlowLogGroup
-  DevelopmentVPCFlowLogs:
+      - StagingVPCFlowLogGroup
+  StagingVPCFlowLogs:
     Type: 'AWS::EC2::FlowLog'
     Properties:
-      ResourceId: !Ref DevVPC
+      ResourceId: !Ref StgVPC
       ResourceType: VPC
       TrafficType: ALL
       DeliverLogsPermissionArn: !GetAtt 
-        - DevelopmentFlowLogsRole
+        - StagingFlowLogsRole
         - Arn
       LogDestinationType: cloud-watch-logs
-      LogGroupName: !Ref DevelopmentVPCFlowLogGroup
+      LogGroupName: !Ref StagingVPCFlowLogGroup
       Tags:
         - Key: Name
-          Value: Development VPC Flow Logs
+          Value: Staging VPC Flow Logs
         - Key: Purpose
           Value: Networking
-  DevCoreSubnet1:
+  StgCoreSubnet1:
     Type: 'AWS::EC2::Subnet'
     Properties:
-      CidrBlock: !Ref DevVPCSubnet1
-      VpcId: !Ref DevVPC
+      CidrBlock: !Ref StgVPCSubnet1
+      VpcId: !Ref StgVPC
       AvailabilityZone: !Select [ 0, !GetAZs "" ]
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Development Core Subnet 1
+          Value: Staging Core Subnet 1
         - Key: Purpose
           Value: Networking
-  DevCoreSubnet2:
+  StgCoreSubnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
-      CidrBlock: !Ref DevVPCSubnet2
-      VpcId: !Ref DevVPC
+      CidrBlock: !Ref StgVPCSubnet2
+      VpcId: !Ref StgVPC
       AvailabilityZone: !Select [ 1, !GetAZs "" ]
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Development Core Subnet 2
+          Value: Staging Core Subnet 2
         - Key: Purpose
           Value: Networking
-  DevPrivateRouteTable1:
+  StgPrivateRouteTable1:
     Type: 'AWS::EC2::RouteTable'
     Properties:
-      VpcId: !Ref DevVPC
+      VpcId: !Ref StgVPC
       Tags:
         - Key: Name
-          Value: Development VPC Private Route Table 1
+          Value: Staging VPC Private Route Table 1
         - Key: Purpose
           Value: Networking
-  DevCore1RouteAssociation:
+  StgCore1RouteAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      RouteTableId: !Ref DevPrivateRouteTable1
-      SubnetId: !Ref DevCoreSubnet1
-  DevCore2RouteAssociation:
+      RouteTableId: !Ref StgPrivateRouteTable1
+      SubnetId: !Ref StgCoreSubnet1
+  StgCore2RouteAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      RouteTableId: !Ref DevPrivateRouteTable1
-      SubnetId: !Ref DevCoreSubnet2
+      RouteTableId: !Ref StgPrivateRouteTable1
+      SubnetId: !Ref StgCoreSubnet2
 Outputs:
-  DevelopmentVPCSubnet1:
-    Value: !Ref DevCoreSubnet1
-  DevelopmentVPCSubnet2:
-    Value: !Ref DevCoreSubnet2
-  DevelopmentVPC:
-    Value: !Ref DevVPC
-  DevelopmentPrivateRouteTable1:
-    Value: !Ref DevPrivateRouteTable1
+  StagingVPCSubnet1:
+    Value: !Ref StgCoreSubnet1
+  StagingVPCSubnet2:
+    Value: !Ref StgCoreSubnet2
+  StagingVPC:
+    Value: !Ref StgVPC
+  StagingPrivateRouteTable1:
+    Value: !Ref StgPrivateRouteTable1
   Help:
     Description: For assistance or questions regarding this quickstart please email compliance-accelerator@amazon.com
     Value: ''
