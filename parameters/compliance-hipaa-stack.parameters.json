@@ -1,0 +1,99 @@
+
+[
+  {
+    "ParameterKey": "AWSConfigARN",
+    "ParameterValue": "arn:aws:iam::959095833080:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig"
+  },
+  {
+    "ParameterKey": "LifecycleExpirationDays",
+    "ParameterValue": "2555"
+  },
+  {
+    "ParameterKey": "LifecycleTransitionStandardIADays",
+    "ParameterValue": "90"
+  },
+  {
+    "ParameterKey": "LifecycleTransitionGlacierDays",
+    "ParameterValue": "180"
+  },
+  {
+    "ParameterKey": "SNSAlarmEmail",
+    "ParameterValue": "mariusz@wolfpack-digital.com"
+  },
+  {
+    "ParameterKey": "CloudTrailLogRetentionDays",
+    "ParameterValue": "90"
+  },
+  {
+    "ParameterKey": "StgVPCCIDRBlock",
+    "ParameterValue": "174.2.0.0/16"
+  },
+  {
+    "ParameterKey": "StgVPCSubnet1",
+    "ParameterValue": "174.2.11.0/24"
+  },
+  {
+    "ParameterKey": "StgVPCSubnet2",
+    "ParameterValue": "174.2.12.0/24"
+  },
+  {
+    "ParameterKey": "StgVPCFlowLogLogGroupRetention",
+    "ParameterValue": "90"
+  },
+  {
+    "ParameterKey": "ProdVPCCIDRBlock",
+    "ParameterValue": "174.1.0.0/16"
+  },
+  {
+    "ParameterKey": "ProdVPCSubnet1",
+    "ParameterValue": "174.1.11.0/24"
+  },
+  {
+    "ParameterKey": "ProdVPCSubnet2",
+    "ParameterValue": "174.1.12.0/24"
+  },
+  {
+    "ParameterKey": "ProdVPCFlowLogLogGroupRetention",
+    "ParameterValue": "90"
+  },
+  {
+    "ParameterKey": "MgmtVPCCIDRBlock",
+    "ParameterValue": "174.0.0.0/16"
+  },
+  {
+    "ParameterKey": "MgmtVPCPublicSubnet1",
+    "ParameterValue": "174.0.1.0/24"
+  },
+  {
+    "ParameterKey": "MgmtVPCPublicSubnet2",
+    "ParameterValue": "174.0.2.0/24"
+  },
+  {
+    "ParameterKey": "MgmtVPCPrivateSubnet1",
+    "ParameterValue": "174.0.11.0/24"
+  },
+  {
+    "ParameterKey": "MgmtVPCPrivateSubnet2",
+    "ParameterValue": "174.0.12.0/24"
+  },
+  {
+    "ParameterKey": "MgmtVPCFlowLogLogGroupRetention",
+    "ParameterValue": "90"
+  },
+  {
+    "ParameterKey": "CreateConfigRecorder",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "CreateConfigDeliveryChannel",
+    "ParameterValue":  "No"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "risolve-aws-cloudformation"
+  },
+  {
+    "ParameterKey": "QSS3BucketRegion",
+    "ParameterValue": "eu-west-1"
+  }
+]

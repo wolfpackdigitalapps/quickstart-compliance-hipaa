@@ -1,0 +1,15 @@
+#!/bin/bash
+
+while getopts s:i: flag
+do
+    case "${flag}" in
+        s) stack_name=${OPTARG};;
+        i) iam_account=${OPTARG};;
+    esac
+done
+echo "Stack name: $stack_name"
+echo "AWS Acccount: $iam_account"
+
+aws cloudformation delete-stack \
+  --stack-name $stack_name \
+  --profile $iam_account

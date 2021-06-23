@@ -1,0 +1,24 @@
+#!/bin/bash
+
+while getopts s:t:p:c:i: flag
+do
+    case "${flag}" in
+        s) stack_name=${OPTARG};;
+        t) template=${OPTARG};;
+        p) parameters=${OPTARG};;
+        c) capabilities=${OPTARG};;
+        i) iam_account=${OPTARG};;
+    esac
+done
+echo "Stack name: $stack_name"
+echo "Template file: $template"
+echo "Parameters file: $parameters"
+echo "Capabilities: $capabilities"
+echo "AWS Acccount: $iam_account"
+
+aws cloudformation create-stack \
+  --stack-name $stack_name \
+  --template-body file:///Users/mariusz/Work/risolve-aws-cloudformation/templates/$template \
+  --parameters file:///Users/mariusz/Work/risolve-aws-cloudformation/parameters/$parameters \
+  --capabilities $capabilities \
+  --profile $iam_account
