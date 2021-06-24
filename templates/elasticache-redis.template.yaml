@@ -1,0 +1,484 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'ElastiCache Redis Cloudformation template'
+
+###############################################################################
+# Metadata 
+###############################################################################
+
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+    - Label:
+        default: 'Parent Stacks'
+      Parameters:
+      - ParentVPCStack
+    - Label:
+        default: 'ElastiCache Parameters'
+      Parameters:
+      - EngineVersion
+      - CacheNodeType
+      - TransitEncryption
+      - AuthToken
+      - SnapshotRetentionLimit
+      - SnapshotName
+      - NumShards
+      - NumReplicas
+      - ClientSecurityGroup
+    - Label:
+        default: 'Alerting Parameters'
+      Parameters:
+      - CPUUtilizationThreshold
+      - DatabaseMemoryUsagePercentageThreshold
+      - SwapUsageThreshold
+      - EvictionsThreshold
+      - ReplicationLagThreshold
+      - NotificationList
+
+###############################################################################
+# Parameters 
+###############################################################################
+
+Parameters:
+  ParentVPCStack:
+    Description: 'Stack name of parent VPC stack based on vpc/vpc-*azs.yaml template.'
+    Type: String
+  ClientSecurityGroup:
+    Description: 'Security group of Redis Clients'
+    Type: String
+  EngineVersion:
+    Description: 'Redis version'
+    Type: String
+    Default: '5.0.0'
+    AllowedValues: # aws elasticache describe-cache-engine-versions --engine redis --query "CacheEngineVersions[].EngineVersion"
+    - '3.2.6' # 3.2.4 and 3.2.10 do not support encryption
+    - '4.0.10'
+    - '5.0.0'
+    - '5.0.3'
+    - '5.0.4'
+    - '5.0.5'
+    - '5.0.6'
+    - '6.x'
+  CacheNodeType:
+    Description: 'The compute and memory capacity of the nodes in the node group (shard).'
+    Type: 'String'
+    Default: 'cache.t2.micro'
+  TransitEncryption:
+    Description: 'Enable encryption for data in transit? (see https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/in-transit-encryption.html)'
+    Type: 'String'
+    Default: 'true'
+    AllowedValues:
+    - 'true'
+    - 'false'
+  AuthToken:
+    Description: 'Optional password (16 to 128 characters) used to authenticate against Redis (requires TransitEncryption := true; leave blank to disable password-protection).'
+    Type: 'String'
+    Default: ''
+    MaxLength: 128
+  SnapshotRetentionLimit:
+    Description: 'The number of days for which ElastiCache retains automatic snapshots before deleting them (set to 0 to disable backups).'
+    Type: Number
+    Default: 35
+    MinValue: 0
+    MaxValue: 35
+  SnapshotName:
+    Description: 'Optional name of a snapshot from which you want to restore (leave blank to create an empty cache).'
+    Type: 'String'
+    Default: ''
+  NumShards:
+    Description: 'Number of shards in the cluster.'
+    Type: 'Number'
+    Default: 1
+    MinValue: 1
+    MaxValue: 250
+  NumReplicas:
+    Description: 'Number of replicas per shard.'
+    Type: 'Number'
+    Default: 1
+    MinValue: 0
+    MaxValue: 5
+  CPUUtilizationThreshold:
+    Description: 'The maximum percentage of CPU usage (set to -1 to disable).'
+    Type: Number
+    Default: 80
+    MinValue: -1
+    MaxValue: 100
+  DatabaseMemoryUsagePercentageThreshold:
+    Description: 'The maximum percentage of memory usage (set to -1 to disable).'
+    Type: Number
+    Default: 90
+    MinValue: -1
+    MaxValue: 100
+  SwapUsageThreshold:
+    Description: 'The maximum bytes of swap usage (set to -1 to disable).'
+    Type: Number
+    Default: 67108864 # 64 MB in Bytes
+    MinValue: -1
+  EvictionsThreshold:
+    Description: 'The maximum number of evictions (set to -1 to disable).'
+    Type: Number
+    Default: 1000
+    MinValue: -1
+  ReplicationLagThreshold:
+    Description: 'The maximum seconds of replication lag (set to -1 to disable).'
+    Type: Number
+    Default: 30
+    MinValue: -1
+  NotificationList:
+    Type: String
+    Description: The Email notification list is used to configure a SNS topic for sending cloudwatch alarm and RDS Event notifications
+    AllowedPattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+    ConstraintDescription: provide a valid email address.
+
+###############################################################################
+# Mappings 
+###############################################################################
+
+Mappings:
+  EngineVersionMap:
+    '3.2.6':
+      CacheParameterGroupFamily: 'redis3.2'
+    '4.0.10':
+      CacheParameterGroupFamily: 'redis4.0'
+    '5.0.0':
+      CacheParameterGroupFamily: 'redis5.0'
+    '5.0.3':
+      CacheParameterGroupFamily: 'redis5.0'
+    '5.0.4':
+      CacheParameterGroupFamily: 'redis5.0'
+    '5.0.5':
+      CacheParameterGroupFamily: 'redis5.0'
+    '5.0.6':
+      CacheParameterGroupFamily: 'redis5.0'
+    '6.x':
+      CacheParameterGroupFamily: 'redis6.x'
+
+###############################################################################
+# Conditions 
+###############################################################################
+
+Conditions:
+  HasAuthToken: !Not [!Equals [!Ref AuthToken, '']]
+  HasSnapshotName: !Not [!Equals [!Ref SnapshotName, '']]
+  HasAutomaticFailoverEnabled: !Not [!Equals [!Ref NumReplicas, 0]]
+
+###############################################################################
+# Resources 
+###############################################################################
+
+Resources:
+  CacheParameterGroup:
+    Type: 'AWS::ElastiCache::ParameterGroup'
+    Properties:
+      CacheParameterGroupFamily: !FindInMap [EngineVersionMap, !Ref EngineVersion, CacheParameterGroupFamily]
+      Description: !Ref 'AWS::StackName'
+      Properties: {}
+  CacheSubnetGroupName:
+    Type: 'AWS::ElastiCache::SubnetGroup'
+    Properties:
+      Description: !Ref 'AWS::StackName'
+      SubnetIds: !Split
+      - ','
+      - 'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Ref 'AWS::StackName'
+      VpcId:
+        'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379
+        SourceSecurityGroupId: !Ref ClientSecurityGroup
+  ReplicationGroup:
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupDescription: !Ref 'AWS::StackName'
+      AtRestEncryptionEnabled: true
+      AuthToken: !If [HasAuthToken, !Ref AuthToken, !Ref 'AWS::NoValue']
+      AutomaticFailoverEnabled: !If [HasAutomaticFailoverEnabled, true, false]
+      MultiAZEnabled: !If [HasAutomaticFailoverEnabled, true, false]
+      CacheNodeType: !Ref CacheNodeType
+      CacheParameterGroupName: !Ref CacheParameterGroup
+      CacheSubnetGroupName: !Ref CacheSubnetGroupName
+      Engine: redis
+      EngineVersion: !Ref EngineVersion
+      KmsKeyId: !Ref ElastiCacheKmsKey
+      NotificationTopicArn: !Ref ElastiCacheSNSTopic
+      NumNodeGroups: !Ref NumShards
+      ReplicasPerNodeGroup: !Ref NumReplicas
+      PreferredMaintenanceWindow: 'sat:07:00-sat:08:00'
+      SecurityGroupIds:
+      - !Ref SecurityGroup
+      SnapshotName: !If [HasSnapshotName, !Ref SnapshotName, !Ref 'AWS::NoValue']
+      SnapshotRetentionLimit: !Ref SnapshotRetentionLimit
+      SnapshotWindow: '00:00-03:00'
+      TransitEncryptionEnabled: !Ref TransitEncryption
+    UpdatePolicy:
+      UseOnlineResharding: true
+  ElastiCacheKmsKey:
+    Type: 'AWS::KMS::Key'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+          Action: 'kms:*'
+          Resource: '*'
+        - Effect: Allow
+          Principal:
+            AWS: '*'
+          Action:
+          - 'kms:Encrypt'
+          - 'kms:Decrypt'
+          - 'kms:ReEncrypt*'
+          - 'kms:GenerateDataKey*'
+          - 'kms:CreateGrant'
+          - 'kms:ListGrants'
+          - 'kms:DescribeKey'
+          Resource: '*'
+          Condition:
+            StringEquals:
+              'kms:CallerAccount': !Ref 'AWS::AccountId'
+              'kms:ViaService': !Sub 'rds.${AWS::Region}.amazonaws.com'
+  ElastiCacheKmsKeyAlias:
+    Type: 'AWS::KMS::Alias'
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    DependsOn: ReplicationGroup
+    Properties:
+      AliasName: !Sub 'alias/${ReplicationGroup}'
+      TargetKeyId: !Ref ElastiCacheKmsKey
+  ElastiCacheSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Endpoint: !Ref NotificationList
+        Protocol: email
+  Node1CPUUtilizationTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average CPU utilization over last 10 minutes higher than ${CPUUtilizationThreshold}%'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: CPUUtilization
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref CPUUtilizationThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-001'
+  Node2CPUUtilizationTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average CPU utilization over last 10 minutes higher than ${CPUUtilizationThreshold}%'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: CPUUtilization
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref CPUUtilizationThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-002'
+  Node1EngineCPUUtilizationTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average engine CPU utilization over last 10 minutes higher than ${CPUUtilizationThreshold}%'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: EngineCPUUtilization
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref CPUUtilizationThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-001'
+  Node2EngineCPUUtilizationTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average engine CPU utilization over last 10 minutes higher than ${CPUUtilizationThreshold}%'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: EngineCPUUtilization
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref CPUUtilizationThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-002'
+  Node1DatabaseMemoryUsagePercentageTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average memory usage over last 10 minutes higher than ${DatabaseMemoryUsagePercentageThreshold}, performance may suffer'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: DatabaseMemoryUsagePercentage
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref DatabaseMemoryUsagePercentageThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-001'
+  Node2DatabaseMemoryUsagePercentageTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average memory usage over last 10 minutes higher than ${DatabaseMemoryUsagePercentageThreshold}, performance may suffer'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: DatabaseMemoryUsagePercentage
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref DatabaseMemoryUsagePercentageThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-002'
+  Node1SwapUsageTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average swap usage over last 10 minutes higher than ${SwapUsageThreshold} bytes, performance may suffer'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: SwapUsage
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref SwapUsageThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-001'
+  Node2SwapUsageTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average swap usage over last 10 minutes higher than ${SwapUsageThreshold} bytes, performance may suffer'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: SwapUsage
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref SwapUsageThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-002'
+  Node1EvictionsTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average evictions over last 10 minutes higher than ${EvictionsThreshold}, cache hit ratio may suffer'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: Evictions
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref EvictionsThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-001'
+  Node2EvictionsTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average evictions over last 10 minutes higher than ${EvictionsThreshold}, cache hit ratio may suffer'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: Evictions
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref EvictionsThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-002'
+  Node1ReplicationLagTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average replication lag over last 10 minutes higher than ${ReplicationLagThreshold} seconds'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: ReplicationLag
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref ReplicationLagThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-001'
+  Node2ReplicationLagTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: !Sub 'Average replication lag over last 10 minutes higher than ${ReplicationLagThreshold} seconds'
+      Namespace: 'AWS/ElastiCache'
+      MetricName: ReplicationLag
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: !Ref ReplicationLagThreshold
+      AlarmActions:
+      - Ref: ElastiCacheSNSTopic
+      Dimensions:
+      - Name: CacheClusterId
+        Value: !Sub '${ReplicationGroup}-002'
+
+###############################################################################
+# Outputs 
+###############################################################################
+
+Outputs:
+  StackName:
+    Description: 'Stack name.'
+    Value: !Sub '${AWS::StackName}'
+  ClusterName:
+    Description: 'The name of the cluster'
+    Value: !Ref ReplicationGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-ClusterName'
+  PrimaryEndPointAddress:
+    Description: 'The DNS address of the primary read-write cache node.'
+    Value: !GetAtt 'ReplicationGroup.PrimaryEndPoint.Address'
+    Export:
+      Name: !Sub '${AWS::StackName}-PrimaryEndPointAddress'
+  PrimaryEndPointPort:
+    Description: 'The port that the primary read-write cache engine is listening on.'
+    Value: !GetAtt 'ReplicationGroup.PrimaryEndPoint.Port'
+    Export:
+      Name: !Sub '${AWS::StackName}-PrimaryEndPointPort'
+  SecurityGroupId:
+    Description: 'The security group used to manage access to Elasticache Redis.'
+    Value: !Ref SecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-SecurityGroupId'
