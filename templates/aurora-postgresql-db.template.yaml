@@ -235,7 +235,7 @@ Resources:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !GetAtt 'ClusterSecurityGroup.GroupId'
-      IpProtocol: -1
+      IpProtocol: "-1"
       SourceSecurityGroupId: !Ref ClusterSecurityGroup
       Description: 'Self Reference'        
       
@@ -258,21 +258,22 @@ Resources:
         log_connections: "1"
         log_disconnections: "1"
         log_lock_waits: "1"
-        log_min_duration_statement: 5000
-        auto_explain.log_min_duration: 5000
-        auto_explain.log_verbose: 1
-        log_rotation_age: 1440
-        log_rotation_size: 102400
-        rds.log_retention_period: 10080
-        random_page_cost: 1
-        track_activity_query_size: 16384
-        idle_in_transaction_session_timeout: 7200000
-        statement_timeout: 7200000
+        log_min_duration_statement: "5000"
+        auto_explain.log_min_duration: "5000"
+        auto_explain.log_verbose: "1"
+        log_rotation_age: "1440"
+        log_rotation_size: "102400"
+        rds.log_retention_period: "10080"
+        random_page_cost: "1"
+        track_activity_query_size: "16384"
+        idle_in_transaction_session_timeout: "7200000"
+        statement_timeout: "7200000"
         search_path: '"$user",public'
 
   AuroraKMSCMK:
     Type: 'AWS::KMS::Key'
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       KeyPolicy:
         Version: '2012-10-17'
@@ -302,6 +303,7 @@ Resources:
   AuroraKMSCMKAlias:
     Type: 'AWS::KMS::Alias'
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     DependsOn: AuroraDBCluster
     Properties:
       AliasName: !Sub 'alias/${AuroraDBCluster}'
@@ -400,7 +402,7 @@ Resources:
         Ref: DBParamGroup
       MonitoringInterval: !If [IsProd, 1, 0]
       MonitoringRoleArn: !If [IsProd, !GetAtt MonitoringIAMRole.Arn, !Ref "AWS::NoValue"]
-      AutoMinorVersionUpgrade: !If [IsProd, 'false', 'true']
+      AutoMinorVersionUpgrade: !If [IsProd, false, true]
       DBSubnetGroupName: !Ref DBSubnetGroup
       PubliclyAccessible: false
       EnablePerformanceInsights: true
@@ -436,7 +438,7 @@ Resources:
         Ref: DBParamGroup
       MonitoringInterval: !If [IsProd, 1, 0]
       MonitoringRoleArn: !If [IsProd, !GetAtt MonitoringIAMRole.Arn, !Ref "AWS::NoValue"]
-      AutoMinorVersionUpgrade: !If [IsProd, 'false', 'true']
+      AutoMinorVersionUpgrade: !If [IsProd, false, true]
       DBSubnetGroupName: !Ref DBSubnetGroup
       PubliclyAccessible: false
       EnablePerformanceInsights: true
@@ -470,11 +472,11 @@ Resources:
       MetricName: CPUUtilization
       Statistic: Maximum
       Namespace: 'AWS/RDS'
-      Threshold: '80'
+      Threshold: 80.0
       Unit: Percent
       ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-      Period: '60'
-      EvaluationPeriods: '5'
+      Period: 60
+      EvaluationPeriods: 5
       TreatMissingData: 'notBreaching'
       
   CPUUtilizationAlarm2:
@@ -492,11 +494,11 @@ Resources:
       MetricName: CPUUtilization
       Statistic: Maximum
       Namespace: 'AWS/RDS'
-      Threshold: '80'
+      Threshold: 80.0
       Unit: Percent
       ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-      Period: '60'
-      EvaluationPeriods: '5'
+      Period: 60
+      EvaluationPeriods: 5
       TreatMissingData: 'notBreaching'
       
   MaxUsedTxIDsAlarm1:
@@ -513,11 +515,11 @@ Resources:
       MetricName: 'MaximumUsedTransactionIDs'
       Statistic: Average
       Namespace: 'AWS/RDS'
-      Threshold: '600000000'
+      Threshold: 600000000
       Unit: Count
       ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-      Period: '60'
-      EvaluationPeriods: '5'
+      Period: 60
+      EvaluationPeriods: 5
       TreatMissingData: 'notBreaching'
       
   MaxUsedTxIDsAlarm2:
@@ -535,11 +537,11 @@ Resources:
       MetricName: 'MaximumUsedTransactionIDs'
       Statistic: Average
       Namespace: 'AWS/RDS'
-      Threshold: '600000000'
+      Threshold: 600000000
       Unit: Count
       ComparisonOperator: 'GreaterThanOrEqualToThreshold'
-      Period: '60'
-      EvaluationPeriods: '5'
+      Period: 60
+      EvaluationPeriods: 5
       TreatMissingData: 'notBreaching'
 
   FreeLocalStorageAlarm1:
@@ -556,11 +558,11 @@ Resources:
       MetricName: 'FreeLocalStorage'
       Statistic: Average
       Namespace: 'AWS/RDS'
-      Threshold: '5368709120'
+      Threshold: 5368709120
       Unit: Bytes
       ComparisonOperator: 'LessThanOrEqualToThreshold'
-      Period: '60'
-      EvaluationPeriods: '5'
+      Period: 60
+      EvaluationPeriods: 5
       TreatMissingData: 'notBreaching'
       
   FreeLocalStorageAlarm2:
@@ -578,11 +580,11 @@ Resources:
       MetricName: 'FreeLocalStorage'
       Statistic: Average
       Namespace: 'AWS/RDS'
-      Threshold: '5368709120'
+      Threshold: 5368709120
       Unit: Bytes
       ComparisonOperator: 'LessThanOrEqualToThreshold'
-      Period: '60'
-      EvaluationPeriods: '5'
+      Period: 60
+      EvaluationPeriods: 5
       TreatMissingData: 'notBreaching'    
       
   DatabaseClusterEventSubscription:
