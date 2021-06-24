@@ -154,8 +154,15 @@ Outputs:
     Value: !Ref StgCoreSubnet1
   StagingVPCSubnet2:
     Value: !Ref StgCoreSubnet2
+  SubnetsPrivate:
+    Description: 'Subnets private'
+    Value: !Join [',', [!Ref StgCoreSubnet1, !Ref StgCoreSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetsPrivate'  
   StagingVPC:
     Value: !Ref StgVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPC'
   StagingPrivateRouteTable1:
     Value: !Ref StgPrivateRouteTable1
   Help:

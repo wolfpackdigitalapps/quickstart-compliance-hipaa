@@ -154,8 +154,15 @@ Outputs:
     Value: !Ref ProductionCoreSubnet1
   ProductionCoreSubnet2:
     Value: !Ref ProductionCoreSubnet2
+  SubnetsPrivate:
+    Description: 'Subnets private'
+    Value: !Join [',', [!Ref ProductionCoreSubnet1, !Ref ProductionCoreSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetsPrivate'  
   ProductionVPC:
     Value: !Ref ProductionVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPC'
   ProductionPrivateRouteTable1:
     Value: !Ref ProductionPrivateRouteTable1
   Help:

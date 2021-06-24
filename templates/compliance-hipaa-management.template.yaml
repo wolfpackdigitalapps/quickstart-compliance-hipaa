@@ -309,6 +309,8 @@ Outputs:
     Value: !Ref ManagementCoreSubnet2
   ManagementVPC:
     Value: !Ref ManagementVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPC'
   ManagementPrivateRouteTable1:
     Value: !Ref ManagementPrivateRouteTable1
   ManagementPrivateRouteTable2:
