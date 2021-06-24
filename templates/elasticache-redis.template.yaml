@@ -18,7 +18,6 @@ Metadata:
       - EngineVersion
       - CacheNodeType
       - TransitEncryption
-      - AuthToken
       - SnapshotRetentionLimit
       - SnapshotName
       - NumShards
@@ -50,7 +49,6 @@ Parameters:
     Type: String
     Default: '5.0.0'
     AllowedValues: # aws elasticache describe-cache-engine-versions --engine redis --query "CacheEngineVersions[].EngineVersion"
-    - '3.2.6' # 3.2.4 and 3.2.10 do not support encryption
     - '4.0.10'
     - '5.0.0'
     - '5.0.3'
@@ -69,11 +67,6 @@ Parameters:
     AllowedValues:
     - 'true'
     - 'false'
-  AuthToken:
-    Description: 'Optional password (16 to 128 characters) used to authenticate against Redis (requires TransitEncryption := true; leave blank to disable password-protection).'
-    Type: 'String'
-    Default: ''
-    MaxLength: 128
   SnapshotRetentionLimit:
     Description: 'The number of days for which ElastiCache retains automatic snapshots before deleting them (set to 0 to disable backups).'
     Type: Number
@@ -128,6 +121,13 @@ Parameters:
     Description: The Email notification list is used to configure a SNS topic for sending cloudwatch alarm and RDS Event notifications
     AllowedPattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
     ConstraintDescription: provide a valid email address.
+  EnvironmentStage:
+    Type: String
+    Description: The environment tag is used to designate the Environment Stage of the associated AWS resource.
+    AllowedValues:
+      - staging
+      - production
+    Default: staging
 
 ###############################################################################
 # Mappings 
@@ -135,8 +135,6 @@ Parameters:
 
 Mappings:
   EngineVersionMap:
-    '3.2.6':
-      CacheParameterGroupFamily: 'redis3.2'
     '4.0.10':
       CacheParameterGroupFamily: 'redis4.0'
     '5.0.0':
@@ -157,9 +155,9 @@ Mappings:
 ###############################################################################
 
 Conditions:
-  HasAuthToken: !Not [!Equals [!Ref AuthToken, '']]
   HasSnapshotName: !Not [!Equals [!Ref SnapshotName, '']]
   HasAutomaticFailoverEnabled: !Not [!Equals [!Ref NumReplicas, 0]]
+  HasSecurityGroup: !Not [!Equals [!Ref ClientSecurityGroup, '']]
 
 ###############################################################################
 # Resources 
@@ -180,6 +178,7 @@ Resources:
       - ','
       - 'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'
   SecurityGroup:
+    Condition: HasSecurityGroup
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: !Ref 'AWS::StackName'
@@ -190,6 +189,36 @@ Resources:
         FromPort: 6379
         ToPort: 6379
         SourceSecurityGroupId: !Ref ClientSecurityGroup
+  ElastiCacheAuthTokenSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Join ['/', [!Ref EnvironmentStage, 'elasticache-redis', !Ref 'AWS::StackName']]
+      Description: !Join ['', ['ElastiCache Redis Auth Token Secret ', !Ref 'AWS::StackName']]
+      Tags:
+        -
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        -
+          Key: StackID
+          Value: !Ref 'AWS::StackId'
+      GenerateSecretString:
+        SecretStringTemplate: '{}'
+        GenerateStringKey: "password"
+        ExcludeCharacters: '"@/\'
+        PasswordLength: 64
+  ElastiCacheAuthTokenSecretResourcePolicy:
+    Type: AWS::SecretsManager::ResourcePolicy
+    Properties:
+      SecretId: !Ref ElastiCacheAuthTokenSecret
+      ResourcePolicy:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Deny"
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "secretsmanager:DeleteSecret"
+            Resource: "*" 
   ReplicationGroup:
     DeletionPolicy: Snapshot
     UpdateReplacePolicy: Snapshot
@@ -197,7 +226,7 @@ Resources:
     Properties:
       ReplicationGroupDescription: !Ref 'AWS::StackName'
       AtRestEncryptionEnabled: true
-      AuthToken: !If [HasAuthToken, !Ref AuthToken, !Ref 'AWS::NoValue']
+      AuthToken: !Join ['', ['{{resolve:secretsmanager:', !Ref ElastiCacheAuthTokenSecret, ':SecretString:password}}' ]]
       AutomaticFailoverEnabled: !If [HasAutomaticFailoverEnabled, true, false]
       MultiAZEnabled: !If [HasAutomaticFailoverEnabled, true, false]
       CacheNodeType: !Ref CacheNodeType
@@ -211,7 +240,7 @@ Resources:
       ReplicasPerNodeGroup: !Ref NumReplicas
       PreferredMaintenanceWindow: 'sat:07:00-sat:08:00'
       SecurityGroupIds:
-      - !Ref SecurityGroup
+      - !If [HasSecurityGroup, !Ref SecurityGroup, !Ref 'AWS::NoValue']
       SnapshotName: !If [HasSnapshotName, !Ref SnapshotName, !Ref 'AWS::NoValue']
       SnapshotRetentionLimit: !Ref SnapshotRetentionLimit
       SnapshotWindow: '00:00-03:00'
