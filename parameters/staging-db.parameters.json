@@ -1,0 +1,46 @@
+[
+  {
+    "ParameterKey": "ParentVPCStack", 
+    "ParameterValue": "RiSolve-HIPAA-Infra-StgStack-RYQWCOBUPQ87"        
+  },
+  {
+    "ParameterKey": "DBName", 
+    "ParameterValue": "risolve_staging_db"
+  },
+  {
+    "ParameterKey": "DBPort", 
+    "ParameterValue": "5432"
+  },
+  {
+    "ParameterKey": "DBUsername", 
+    "ParameterValue": "risolve_staging"
+  },
+  {
+    "ParameterKey": "DBEngineVersion", 
+    "ParameterValue": "10.11" 
+  },
+  {
+    "ParameterKey": "DBInstanceClass", 
+    "ParameterValue": "db.t3.medium"
+  },
+  {
+    "ParameterKey": "EnvironmentStage", 
+    "ParameterValue": "staging"
+  },
+  {
+    "ParameterKey": "Application", 
+    "ParameterValue": "RiSolve"
+  },
+  {
+    "ParameterKey": "NotificationList", 
+    "ParameterValue": "mariusz@wolfpack-digital.com"
+  },
+  {
+    "ParameterKey": "Confidentiality", 
+    "ParameterValue": "pii/phi"
+  },
+  {
+    "ParameterKey": "Compliance", 
+    "ParameterValue": "hipaa"
+  }
+]
