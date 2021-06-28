@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "ParentVPCStack", 
-    "ParameterValue": "RiSolve-HIPAA-Infra-StgStack-RYQWCOBUPQ87"        
+    "ParameterValue": "RiSolve-HIPAA-Infra-StgStack-PN84MHR3U8EH"
   },
   {
     "ParameterKey": "DBName", 
