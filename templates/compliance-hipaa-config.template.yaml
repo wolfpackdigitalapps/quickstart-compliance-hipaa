@@ -113,23 +113,18 @@ Resources:
             Condition:
               StringEquals:
                 's3:x-amz-acl': bucket-owner-full-control
-  # Used to create a short dynamic name
-  PsuedoRandom:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: DoNotUse
   AWSConfigDeliveryChannel:
     Type: 'AWS::Config::DeliveryChannel'
     Condition: CreateConfigDeliveryChannelYes
     Properties:
       S3BucketName: !Ref AWSConfigLoggingBucket
-      Name: !Sub "default-${PsuedoRandom.GroupId}"
+      Name: default
   AWSConfigConfigurationRecorder:
     Type: 'AWS::Config::ConfigurationRecorder'
     Condition: CreateConfigRecorderYes
     Properties:
       RoleARN: !Ref AWSConfigARN
-      Name: !Sub "default-${PsuedoRandom.GroupId}"
+      Name: default
   AWSConfigHIPAAConformancePack:
     Type: 'AWS::Config::ConformancePack'
     Metadata:
