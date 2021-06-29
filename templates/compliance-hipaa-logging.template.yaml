@@ -229,6 +229,12 @@ Resources:
                 Service: cloudtrail.amazonaws.com
               Action: 'SNS:Publish'
               Resource: !Ref SNSSecurityAlarmTopic
+            - Sid: AWSCloudWatchSNSPolicy
+              Effect: Allow
+              Principal:
+                Service: cloudwatch.amazonaws.com
+              Action: 'SNS:Publish'
+              Resource: !Ref SNSSecurityAlarmTopic
       Topics: 
         - !Ref SNSSecurityAlarmTopic
   CloudTrailLogGroup:
