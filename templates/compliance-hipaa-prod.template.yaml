@@ -152,8 +152,20 @@ Resources:
 Outputs:
   ProductionCoreSubnet1:
     Value: !Ref ProductionCoreSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-CoreSubnet1'
   ProductionCoreSubnet2:
     Value: !Ref ProductionCoreSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-CoreSubnet2'
+  ProductionVPCPrivateSubnet1CIDR:
+    Value: !Ref ProdVPCSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet1CIDR'
+  ProductionVPCPrivateSubnet2CIDR:
+    Value: !Ref ProdVPCSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet2CIDR'
   SubnetsPrivate:
     Description: 'Subnets private'
     Value: !Join [',', [!Ref ProductionCoreSubnet1, !Ref ProductionCoreSubnet2]]

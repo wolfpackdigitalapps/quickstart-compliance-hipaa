@@ -26,15 +26,15 @@
   },
   {
     "ParameterKey": "StgVPCCIDRBlock",
-    "ParameterValue": "174.2.0.0/16"
+    "ParameterValue": "192.168.0.0/16"
   },
   {
     "ParameterKey": "StgVPCSubnet1",
-    "ParameterValue": "174.2.11.0/24"
+    "ParameterValue": "192.168.1.0/24"
   },
   {
     "ParameterKey": "StgVPCSubnet2",
-    "ParameterValue": "174.2.12.0/24"
+    "ParameterValue": "192.168.2.0/24"
   },
   {
     "ParameterKey": "StgVPCFlowLogLogGroupRetention",
@@ -42,15 +42,15 @@
   },
   {
     "ParameterKey": "ProdVPCCIDRBlock",
-    "ParameterValue": "174.1.0.0/16"
+    "ParameterValue": "172.16.0.0/16"
   },
   {
     "ParameterKey": "ProdVPCSubnet1",
-    "ParameterValue": "174.1.11.0/24"
+    "ParameterValue": "172.16.1.0/24"
   },
   {
     "ParameterKey": "ProdVPCSubnet2",
-    "ParameterValue": "174.1.12.0/24"
+    "ParameterValue": "172.16.2.0/24"
   },
   {
     "ParameterKey": "ProdVPCFlowLogLogGroupRetention",
@@ -58,23 +58,23 @@
   },
   {
     "ParameterKey": "MgmtVPCCIDRBlock",
-    "ParameterValue": "174.0.0.0/16"
+    "ParameterValue": "10.0.0.0/16"
   },
   {
     "ParameterKey": "MgmtVPCPublicSubnet1",
-    "ParameterValue": "174.0.1.0/24"
+    "ParameterValue": "10.0.1.0/24"
   },
   {
     "ParameterKey": "MgmtVPCPublicSubnet2",
-    "ParameterValue": "174.0.2.0/24"
+    "ParameterValue": "10.0.2.0/24"
   },
   {
     "ParameterKey": "MgmtVPCPrivateSubnet1",
-    "ParameterValue": "174.0.11.0/24"
+    "ParameterValue": "10.0.3.0/24"
   },
   {
     "ParameterKey": "MgmtVPCPrivateSubnet2",
-    "ParameterValue": "174.0.12.0/24"
+    "ParameterValue": "10.0.4.0/24"
   },
   {
     "ParameterKey": "MgmtVPCFlowLogLogGroupRetention",
@@ -90,7 +90,7 @@
   },
   {
     "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "risolve-aws-cloudformation"
+    "ParameterValue": "risolve-aws-cloudformation-templates"
   },
   {
     "ParameterKey": "QSS3BucketRegion",

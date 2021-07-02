@@ -152,8 +152,20 @@ Resources:
 Outputs:
   StagingVPCSubnet1:
     Value: !Ref StgCoreSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-CoreSubnet1'
   StagingVPCSubnet2:
     Value: !Ref StgCoreSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-CoreSubnet2'
+  StagingVPCPrivateSubnet1CIDR:
+    Value: !Ref StgVPCSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet1CIDR'
+  StagingVPCPrivateSubnet2CIDR:
+    Value: !Ref StgVPCSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet2CIDR'
   SubnetsPrivate:
     Description: 'Subnets private'
     Value: !Join [',', [!Ref StgCoreSubnet1, !Ref StgCoreSubnet2]]

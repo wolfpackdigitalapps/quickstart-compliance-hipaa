@@ -303,10 +303,30 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref ManagementNATGateway2
 Outputs:
+  ManagementPublicSubnet1:
+    Value: !Ref ManagementDMZSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnet1'
+  ManagementPublicSubnet2:
+    Value: !Ref ManagementDMZSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnet2'
   ManagementCoreSubnet1:
     Value: !Ref ManagementCoreSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-CoreSubnet1'
   ManagementCoreSubnet2:
     Value: !Ref ManagementCoreSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-CoreSubnet2'
+  ManagementVPCPrivateSubnet1CIDR:
+    Value: !Ref MgmtVPCPrivateSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet1CIDR'
+  ManagementVPCPrivateSubnet2CIDR:
+    Value: !Ref MgmtVPCPrivateSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet2CIDR'
   ManagementVPC:
     Value: !Ref ManagementVPC
     Export:
