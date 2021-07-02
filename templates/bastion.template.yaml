@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation Template to create Aurora Postgresql Cluster DB Instance'
+
+###############################################################################
+# Parameters 
+###############################################################################   
+
+Parameters:
+
+  ParentVPCStack:
+    Description: 'Provide Stack name of parent VPC stack. Refer Cloudformation dashboard in AWS Console to get this.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+   
+  EC2InstanceType:
+    Description: Select EC2 instance type
+    Type: String
+    Default: t3.medium
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - t3a.nano
+      - t3a.micro
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - t3a.2xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5.metal
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+      - m5d.8xlarge
+      - m5d.12xlarge
+      - m5d.16xlarge
+      - m5d.24xlarge
+      - m5d.metal
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+      - m5ad.large
+      - m5ad.xlarge
+      - m5ad.2xlarge
+      - m5ad.4xlarge
+      - m5ad.8xlarge
+      - m5ad.12xlarge
+      - m5ad.16xlarge
+      - m5ad.24xlarge
+  
+  EC2InstanceAMI:
+    Description: Select EC2 AMI
+    Type: AWS::EC2::Image::Id
+    Default: ami-0874dad5025ca362c
+  
+###############################################################################
+# Parameter groups
+###############################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: EC2 Parameters
+        Parameters:
+          - EC2InstanceType
+          - EC2InstanceAMI
+      -
+        Label:
+          default: Networking
+        Parameters:
+          - ParentVPCStack
+
+###############################################################################
+# Mappings
+###############################################################################
+
+# Mappings:
+
+###############################################################################
+# Conditions
+############################################################################### 
+
+# Conditions:
+  
+###############################################################################
+# Resources 
+###############################################################################   
+    
+Resources:
+  BastionHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security group for Bastion Host EC2 instance
+      GroupName: !Join ['-', [!Ref 'AWS::StackName', 'sg']]
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags: 
+        -
+          Key: Name
+          Value: !Sub '${AWS::StackName}-BastionHostSecurityGroup'
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+  BastionHost:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: risolve-ssh-key
+      DisableApiTermination: true
+      ImageId: !Ref EC2InstanceAMI
+      InstanceType: !Ref EC2InstanceType
+      Monitoring: true
+      SubnetId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-PublicSubnet1'}
+      SecurityGroupIds:
+        - !Ref BastionHostSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 8
+            DeleteOnTermination: false
+            Encrypted: true
+
+###############################################################################
+# Outputs 
+###############################################################################   
+
+Outputs:
+  BastionSecurityGroupID:
+    Value: !Ref BastionHostSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-BastionSecurityGroupID'
+

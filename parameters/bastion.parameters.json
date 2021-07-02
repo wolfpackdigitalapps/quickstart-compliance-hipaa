@@ -1,0 +1,11 @@
+[
+  {
+    "ParameterKey": "ParentVPCStack",
+    "ParameterValue": "RiSolve-HIPAA-Infra-MgmtStack-1IAXJBCEWCDVF"         
+  },
+  {
+    "ParameterKey": "EC2InstanceType",
+    "ParameterValue": "t2.nano"
+  }
+]
+
