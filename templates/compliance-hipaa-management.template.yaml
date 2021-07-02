@@ -319,14 +319,32 @@ Outputs:
     Value: !Ref ManagementCoreSubnet2
     Export:
       Name: !Sub '${AWS::StackName}-CoreSubnet2'
+  ManagementVPCPublicSubnet1CIDR:
+    Value: !Ref MgmtVPCPublicSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnet1CIDR'
+  ManagementVPCPublicSubnet2CIDR:
+    Value: !Ref MgmtVPCPublicSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnet2CIDR'
   ManagementVPCPrivateSubnet1CIDR:
     Value: !Ref MgmtVPCPrivateSubnet1
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSubnet1CIDR'
   ManagementVPCPrivateSubnet2CIDR:
-    Value: !Ref MgmtVPCPrivateSubnet1
+    Value: !Ref MgmtVPCPrivateSubnet2
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSubnet2CIDR'
+  SubnetsPrivate:
+    Description: 'Subnets private'
+    Value: !Join [',', [!Ref ManagementCoreSubnet1, !Ref ManagementCoreSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetsPrivate'
+  SubnetsPublic:
+    Description: 'Subnets public'
+    Value: !Join [',', [!Ref ManagementDMZSubnet1, !Ref ManagementDMZSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-SubnetsPublic'
   ManagementVPC:
     Value: !Ref ManagementVPC
     Export:

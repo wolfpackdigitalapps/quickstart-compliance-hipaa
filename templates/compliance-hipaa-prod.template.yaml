@@ -163,7 +163,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSubnet1CIDR'
   ProductionVPCPrivateSubnet2CIDR:
-    Value: !Ref ProdVPCSubnet1
+    Value: !Ref ProdVPCSubnet2
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSubnet2CIDR'
   SubnetsPrivate:
