@@ -302,6 +302,34 @@ Resources:
       RouteTableId: !Ref ManagementPrivateRouteTable2
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref ManagementNATGateway2
+  ManagementPrivateIPPrefixList:
+    Type: AWS::EC2::PrefixList
+    Properties: 
+      AddressFamily: IPv4
+      Entries: 
+        - Cidr: !Ref MgmtVPCPrivateSubnet1
+          Description: !Sub '${AWS::StackName}-CoreSubnet1'
+        - Cidr: !Ref MgmtVPCPrivateSubnet2
+          Description: !Sub '${AWS::StackName}-CoreSubnet2'
+      MaxEntries: 100
+      PrefixListName: !Sub '${AWS::StackName}-SubnetIPs'
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-SubnetIPs'
+  ManagementPublicIPPrefixList:
+    Type: AWS::EC2::PrefixList
+    Properties: 
+      AddressFamily: IPv4
+      Entries: 
+        - Cidr: !Ref MgmtVPCPublicSubnet1
+          Description: !Sub '${AWS::StackName}-PublicSubnet1'
+        - Cidr: !Ref MgmtVPCPublicSubnet2
+          Description: !Sub '${AWS::StackName}-PublicSubnet2'
+      MaxEntries: 100
+      PrefixListName: !Sub '${AWS::StackName}-PublicSubnetIPs'
+      Tags: 
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-PublicSubnetIPs'
 Outputs:
   ManagementPublicSubnet1:
     Value: !Ref ManagementDMZSubnet1
@@ -345,6 +373,16 @@ Outputs:
     Value: !Join [',', [!Ref ManagementDMZSubnet1, !Ref ManagementDMZSubnet2]]
     Export:
       Name: !Sub '${AWS::StackName}-SubnetsPublic'
+  ManagementPrivatePrefixList:
+    Description: 'Managed IP Prefix list'
+    Value: !Ref ManagementPrivateIPPrefixList
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivatePrefixList'  
+  ManagementPublicPrefixList:
+    Description: 'Managed IP Prefix list'
+    Value: !Ref ManagementPublicIPPrefixList
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicPrefixList'  
   ManagementVPC:
     Value: !Ref ManagementVPC
     Export:
