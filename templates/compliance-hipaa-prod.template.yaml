@@ -158,7 +158,7 @@ Resources:
           Description: !Sub '${AWS::StackName}-CoreSubnet1'
         - Cidr: !Ref ProdVPCSubnet2
           Description: !Sub '${AWS::StackName}-CoreSubnet2'
-      MaxEntries: 100
+      MaxEntries: 2
       PrefixListName: !Sub '${AWS::StackName}-SubnetIPs'
       Tags: 
         - Key: Name
@@ -185,7 +185,7 @@ Outputs:
     Value: !Join [',', [!Ref ProductionCoreSubnet1, !Ref ProductionCoreSubnet2]]
     Export:
       Name: !Sub '${AWS::StackName}-SubnetsPrivate'  
-  StagingPrefixList:
+  ProductionPrefixList:
     Description: 'Managed IP Prefix list'
     Value: !Ref ProductionPrivateIPPrefixList
     Export:

@@ -158,7 +158,7 @@ Resources:
           Description: !Sub '${AWS::StackName}-CoreSubnet1'
         - Cidr: !Ref StgVPCSubnet2
           Description: !Sub '${AWS::StackName}-CoreSubnet2'
-      MaxEntries: 100
+      MaxEntries: 2
       PrefixListName: !Sub '${AWS::StackName}-SubnetIPs'
       Tags: 
         - Key: Name

@@ -311,7 +311,7 @@ Resources:
           Description: !Sub '${AWS::StackName}-CoreSubnet1'
         - Cidr: !Ref MgmtVPCPrivateSubnet2
           Description: !Sub '${AWS::StackName}-CoreSubnet2'
-      MaxEntries: 100
+      MaxEntries: 2
       PrefixListName: !Sub '${AWS::StackName}-SubnetIPs'
       Tags: 
         - Key: Name
@@ -325,7 +325,7 @@ Resources:
           Description: !Sub '${AWS::StackName}-PublicSubnet1'
         - Cidr: !Ref MgmtVPCPublicSubnet2
           Description: !Sub '${AWS::StackName}-PublicSubnet2'
-      MaxEntries: 100
+      MaxEntries: 2
       PrefixListName: !Sub '${AWS::StackName}-PublicSubnetIPs'
       Tags: 
         - Key: Name
@@ -377,12 +377,12 @@ Outputs:
     Description: 'Managed IP Prefix list'
     Value: !Ref ManagementPrivateIPPrefixList
     Export:
-      Name: !Sub '${AWS::StackName}-PrivatePrefixList'  
+      Name: !Sub '${AWS::StackName}-PrivatePrefixList'
   ManagementPublicPrefixList:
     Description: 'Managed IP Prefix list'
     Value: !Ref ManagementPublicIPPrefixList
     Export:
-      Name: !Sub '${AWS::StackName}-PublicPrefixList'  
+      Name: !Sub '${AWS::StackName}-PublicPrefixList'
   ManagementVPC:
     Value: !Ref ManagementVPC
     Export:
