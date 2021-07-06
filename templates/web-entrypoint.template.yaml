@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation Template to create Aurora Postgresql Cluster DB Instance'
+
+###############################################################################
+# Parameters 
+###############################################################################   
+
+Parameters:
+
+  ParentVPCStack:
+    Description: 'Provide Stack name of parent VPC stack. Refer Cloudformation dashboard in AWS Console to get this.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+
+  ChildVPCStack:
+    Description: 'Provide Stack name of Child VPC stack. Refer Cloudformation dashboard in AWS Console to get this.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+  
+  TargetAvailabilityZoneIpA:
+    Description: 'IP address of internal load balancer from availability zone A.'
+    Type: String
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})
+    ConstraintDescription: must be a valid IP address of the form x.x.x.x.
+  
+  TargetAvailabilityZoneIpB:
+    Description: 'IP address of internal load balancer from availability zone b.'
+    Type: String
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})
+    ConstraintDescription: must be a valid IP address of the form x.x.x.x.
+               
+  ###########################################################################
+  # Mandatory tags that will be added to all resources that support tags
+  ###########################################################################
+    
+  EnvironmentStage:
+    Type: String
+    Description: The environment tag is used to designate the Environment Stage of the associated AWS resource.
+    AllowedValues:
+      - staging
+      - production
+    Default: staging
+
+  Application:
+    Type: String
+    Description: The Application tag is used to designate the application of the associated AWS resource. In this capacity application does not refer to an installed software component, but rather the overall business application that the resource supports.
+    AllowedPattern: "^[a-zA-Z]+[a-zA-Z ]+[a-zA-Z]+$"
+    ConstraintDescription: provide a valid application name containing only letters and spaces
+    
+###############################################################################
+# Parameter groups
+###############################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Environment
+        Parameters:
+          - EnvironmentStage
+      -
+        Label:
+          default: Networking
+        Parameters:
+          - ParentVPCStack
+          - ChildVPCStack
+      -
+        Label:
+          default: Mandatory Tags
+        Parameters:
+          - Application
+          
+###############################################################################
+# Mappings
+###############################################################################
+    
+###############################################################################
+# Conditions
+############################################################################### 
+
+# Conditions:
+  
+###############################################################################
+# Resources 
+###############################################################################   
+    
+Resources:
+  PublicLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      IpAddressType: ipv4
+      # TODO: Add S3 access log
+      # LoadBalancerAttributes: 
+      #   - LoadBalancerAttribute
+      Name: !Sub '${Application}-${EnvironmentStage}-public-ELB'
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref PublicLoadBalancerSecurityGroup
+      Subnets: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPublic'}]
+      Tags:
+        - Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - Key: Application
+          Value: !Ref Application
+        - Key: Usage
+          Value: public
+      Type: application
+  PublicLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${Application}-${EnvironmentStage}'
+      TargetType: ip
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+      Protocol: HTTP
+      Port: 80
+      Targets: 
+        - Id: !Ref TargetAvailabilityZoneIpA
+          Port: 80
+          AvailabilityZone: all
+        - Id: !Ref TargetAvailabilityZoneIpB
+          Port: 80
+          AvailabilityZone: all
+      Tags: 
+        - 
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - 
+          Key: Application 
+          Value: !Ref Application
+  PublicLoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security group for public Application load balancer
+      GroupName: !Join ['-', ['public', !Ref Application, !Ref EnvironmentStage, 'sg']]
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress: 
+       - IpProtocol: tcp
+         FromPort: 80
+         ToPort: 80
+         DestinationPrefixListId: {'Fn::ImportValue': !Sub '${ChildVPCStack}-PrefixList'}
+      Tags: 
+        -
+          Key: Name
+          Value: !Sub 'public-${Application}-${EnvironmentStage}-ELB-SecurityGroup'
+        - 
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - 
+          Key: Application 
+          Value: !Ref Application
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+  HTTPlistener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref PublicLoadBalancerTargetGroup
+      LoadBalancerArn: !Ref PublicLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+###############################################################################
+# Outputs 
+###############################################################################   
+
+# Outputs:
+

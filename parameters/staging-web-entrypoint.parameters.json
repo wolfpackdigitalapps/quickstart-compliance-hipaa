@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "ParentVPCStack",
+    "ParameterValue": "RiSolve-HIPAA-Infra-MgmtStack-1IAXJBCEWCDVF"         
+  },
+  {
+    "ParameterKey": "ChildVPCStack",
+    "ParameterValue": "RiSolve-HIPAA-Infra-StgStack-30IPNXQZEYNG"         
+  },
+  {
+    "ParameterKey": "Application", 
+    "ParameterValue": "risolve"
+  },
+  {
+    "ParameterKey": "TargetAvailabilityZoneIpA", 
+    "ParameterValue": "192.168.1.225"
+  },
+  {
+    "ParameterKey": "TargetAvailabilityZoneIpB", 
+    "ParameterValue": "192.168.2.120"
+  }
+]
