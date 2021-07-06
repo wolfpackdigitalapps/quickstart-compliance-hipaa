@@ -1,0 +1,332 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation Template to create Aurora Postgresql Cluster DB Instance'
+
+###############################################################################
+# Parameters 
+###############################################################################   
+
+Parameters:
+
+  ParentVPCStack:
+    Description: 'Provide Stack name of parent VPC stack. Refer Cloudformation dashboard in AWS Console to get this.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+
+  MgmtVPCStack:
+    Description: 'Provide Stack name of Management VPC stack. Refer Cloudformation dashboard in AWS Console to get this.'
+    Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
+               
+  EC2InstanceType:
+    Description: Select EC2 instance type
+    Type: String
+    Default: t3.medium
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - t3a.nano
+      - t3a.micro
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - t3a.2xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5.metal
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+      - m5d.8xlarge
+      - m5d.12xlarge
+      - m5d.16xlarge
+      - m5d.24xlarge
+      - m5d.metal
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+      - m5ad.large
+      - m5ad.xlarge
+      - m5ad.2xlarge
+      - m5ad.4xlarge
+      - m5ad.8xlarge
+      - m5ad.12xlarge
+      - m5ad.16xlarge
+      - m5ad.24xlarge
+  
+  EC2InstanceAMI:
+    Description: Select EC2 AMI
+    Type: AWS::EC2::Image::Id
+    Default: ami-0874dad5025ca362c
+
+  ###########################################################################
+  # Mandatory tags that will be added to all resources that support tags
+  ###########################################################################
+    
+  EnvironmentStage:
+    Type: String
+    Description: The environment tag is used to designate the Environment Stage of the associated AWS resource.
+    AllowedValues:
+      - staging
+      - production
+    Default: staging
+
+  Application:
+    Type: String
+    Description: The Application tag is used to designate the application of the associated AWS resource. In this capacity application does not refer to an installed software component, but rather the overall business application that the resource supports.
+    AllowedPattern: "^[a-zA-Z]+[a-zA-Z ]+[a-zA-Z]+$"
+    ConstraintDescription: provide a valid application name containing only letters and spaces
+    
+###############################################################################
+# Parameter groups
+###############################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Environment
+        Parameters:
+          - EnvironmentStage
+      -
+        Label:
+          default: EC2 Parameters
+        Parameters:
+          - EC2InstanceType
+          - EC2InstanceAMI
+      -
+        Label:
+          default: Networking
+        Parameters:
+          - ParentVPCStack
+      -
+        Label:
+          default: Mandatory Tags
+        Parameters:
+          - Application
+          
+###############################################################################
+# Mappings
+###############################################################################
+    
+###############################################################################
+# Conditions
+############################################################################### 
+
+# Conditions:
+  
+###############################################################################
+# Resources 
+###############################################################################   
+    
+Resources:
+  EC2InstanceProfileRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: EC2InstanceProfileDescribeSecret
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - 
+                Effect: Allow
+                Action: 'secretsmanager:DescribeSecret'
+                Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '*']]]]
+        - PolicyName: EC2InstanceProfileGetSecretValue
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - 
+                Effect: Allow
+                Action: 'secretsmanager:GetSecretValue'
+                Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '*']]]]
+                Condition:
+                  'ForAnyValue:StringLike':
+                    'secretsmanager:VersionStage': 'AWSCURRENT' 
+  EC2IAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Join ['-', [ !Ref Application, 'instance-profile']] 
+      Roles:
+        - !Ref EC2InstanceProfileRole
+  EC2SecurityGroupHTTPIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EC2SecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !Ref WebLoadBalancerSecurityGroup
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security group for EC2 instance
+      GroupName: !Join ['-', [!Ref 'AWS::StackName', !Ref Application, 'sg']]
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourcePrefixListId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-PublicPrefixList'} 
+      Tags: 
+        -
+          Key: Name
+          Value: !Sub '${AWS::StackName}-EC2SecurityGroup'
+        - 
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - 
+          Key: Application 
+          Value: !Ref Application
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: risolve-ssh-key
+      # CHANGE_ME: DisableApiTermination: true
+      ImageId: !Ref EC2InstanceAMI
+      InstanceType: !Ref EC2InstanceType
+      Monitoring: true
+      SubnetId: !Select [0, !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]]
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref EC2IAMInstanceProfile
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        sudo apt update 
+        sudo apt -y install apache2
+        sudo systemctl start apache2
+      Tags:
+        - 
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - 
+          Key: Application 
+          Value: !Ref Application
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 8
+            DeleteOnTermination: false
+            Encrypted: true
+  WebLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      IpAddressType: ipv4
+      # TODO: Add S3 access log
+      # LoadBalancerAttributes: 
+      #   - LoadBalancerAttribute
+      Name: !Sub '${Application}-${EnvironmentStage}-internal-ELB'
+      Scheme: internal
+      SecurityGroups:
+        - !Ref WebLoadBalancerSecurityGroup
+      Subnets: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]
+      Tags:
+        - Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - Key: Application
+          Value: !Ref Application
+        - Key: Usage
+          Value: internal
+      Type: application
+  WebLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub 'internal-${Application}-${EnvironmentStage}'
+      TargetType: instance
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+      Protocol: HTTP
+      Port: 80
+      Targets: 
+        - Id: !Ref EC2Instance
+          Port: 80
+      Tags: 
+        - 
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - 
+          Key: Application 
+          Value: !Ref Application
+  WebLoadBalancerHTTPIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref WebLoadBalancerSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourcePrefixListId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-PublicPrefixList'} 
+  WebLoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security group for internal Application load balancer
+      GroupName: !Join ['-', ['internal', !Ref Application, !Ref EnvironmentStage, 'sg']]
+      SecurityGroupEgress: 
+       - IpProtocol: tcp
+         FromPort: 80
+         ToPort: 80
+         DestinationSecurityGroupId: !Ref EC2SecurityGroup
+      Tags: 
+        -
+          Key: Name
+          Value: !Sub 'internal-${Application}-${EnvironmentStage}-ELB-SecurityGroup'
+        - 
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        - 
+          Key: Application 
+          Value: !Ref Application
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+  HTTPlistener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref WebLoadBalancerTargetGroup
+      LoadBalancerArn: !Ref WebLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+###############################################################################
+# Outputs 
+###############################################################################   
+
+# Outputs:
+
