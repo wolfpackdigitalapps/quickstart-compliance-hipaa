@@ -410,7 +410,6 @@ Resources:
   AuroraDBFirstInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      CopyTagsToSnapshot: true  
       DBInstanceClass:
         Ref: DBInstanceClass
       DBClusterIdentifier: !Ref AuroraDBCluster  
@@ -446,7 +445,6 @@ Resources:
     DependsOn: 
       - AuroraDBFirstInstance
     Properties:
-      CopyTagsToSnapshot: true  
       DBInstanceClass:
         Ref: DBInstanceClass
       DBClusterIdentifier: !Ref AuroraDBCluster  
