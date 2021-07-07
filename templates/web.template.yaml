@@ -213,37 +213,53 @@ Resources:
           Key: Application 
           Value: !Ref Application
       VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
-  EC2Instance:
-    Type: AWS::EC2::Instance
+  EC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties: 
+      LaunchTemplateData: 
+        ImageId: !Ref EC2InstanceAMI
+        InstanceType: !Ref EC2InstanceType
+        KeyName: risolve-ssh-key
+        DisableApiTermination: true
+        IamInstanceProfile:
+          Name: !Ref EC2IAMInstanceProfile
+        Monitoring:
+          Enabled: true
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroup
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeType: gp2
+              VolumeSize: 8
+              DeleteOnTermination: false
+              Encrypted: true
+        UserData: !Base64 |
+          #!/bin/bash -ex
+          sudo apt update 
+          sudo apt -y install apache2
+          sudo systemctl start apache2
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: !Sub '${Application}-${EnvironmentStage}'
+              - Key: EnvironmentStage
+                Value: !Ref EnvironmentStage
+              - Key: Application 
+                Value: !Ref Application
+  EC2AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      KeyName: risolve-ssh-key
-      # CHANGE_ME: DisableApiTermination: true
-      ImageId: !Ref EC2InstanceAMI
-      InstanceType: !Ref EC2InstanceType
-      Monitoring: true
-      SubnetId: !Select [0, !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]]
-      SecurityGroupIds:
-        - !Ref EC2SecurityGroup
-      IamInstanceProfile: !Ref EC2IAMInstanceProfile
-      UserData: !Base64 |
-        #!/bin/bash -ex
-        sudo apt update 
-        sudo apt -y install apache2
-        sudo systemctl start apache2
-      Tags:
-        - 
-          Key: EnvironmentStage
-          Value: !Ref EnvironmentStage
-        - 
-          Key: Application 
-          Value: !Ref Application
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            VolumeType: gp2
-            VolumeSize: 8
-            DeleteOnTermination: false
-            Encrypted: true
+      MinSize: '1'
+      MaxSize: '4'
+      DesiredCapacity: '2'
+      LaunchTemplate:
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+      VPCZoneIdentifier: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]
+      TargetGroupARNs:
+        - !Ref WebLoadBalancerTargetGroup
   WebLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties: 
@@ -272,9 +288,6 @@ Resources:
       VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
       Protocol: HTTP
       Port: 80
-      Targets: 
-        - Id: !Ref EC2Instance
-          Port: 80
       Tags: 
         - 
           Key: EnvironmentStage
