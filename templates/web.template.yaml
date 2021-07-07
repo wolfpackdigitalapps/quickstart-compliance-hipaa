@@ -325,5 +325,9 @@ Resources:
 # Outputs 
 ###############################################################################   
 
-# Outputs:
-
+Outputs:
+  EC2InstanceSecurityGroup:
+    Description: Security group of EC2 instance
+    Value: !Ref EC2SecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-EC2SecurityGroup'
