@@ -12,6 +12,7 @@ Metadata:
         default: 'Parent Stacks'
       Parameters:
       - ParentVPCStack
+      - WebVPCStack
     - Label:
         default: 'ElastiCache Parameters'
       Parameters:
@@ -22,7 +23,6 @@ Metadata:
       - SnapshotName
       - NumShards
       - NumReplicas
-      - ClientSecurityGroup
     - Label:
         default: 'Alerting Parameters'
       Parameters:
@@ -41,9 +41,12 @@ Parameters:
   ParentVPCStack:
     Description: 'Stack name of parent VPC stack based on vpc/vpc-*azs.yaml template.'
     Type: String
-  ClientSecurityGroup:
-    Description: 'Security group of Redis Clients'
+  WebVPCStack:
+    Description: 'Provide Stack name of Web VPC stack that needs to accessed DB. Refer Cloudformation dashboard in AWS Console to get this.'
     Type: String
+    MinLength: '1'
+    MaxLength: '128'
+    AllowedPattern: '^[a-zA-Z]+[0-9a-zA-Z\-]*$'
   EngineVersion:
     Description: 'Redis version'
     Type: String
@@ -157,7 +160,6 @@ Mappings:
 Conditions:
   HasSnapshotName: !Not [!Equals [!Ref SnapshotName, '']]
   HasAutomaticFailoverEnabled: !Not [!Equals [!Ref NumReplicas, 0]]
-  HasSecurityGroup: !Not [!Equals [!Ref ClientSecurityGroup, '']]
 
 ###############################################################################
 # Resources 
@@ -178,17 +180,15 @@ Resources:
       - ','
       - 'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'
   SecurityGroup:
-    Condition: HasSecurityGroup
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: !Ref 'AWS::StackName'
-      VpcId:
-        'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'
+      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 6379
         ToPort: 6379
-        SourceSecurityGroupId: !Ref ClientSecurityGroup
+        SourceSecurityGroupId: {'Fn::ImportValue': !Sub '${WebVPCStack}-EC2SecurityGroup'}
   ElastiCacheAuthTokenSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -239,8 +239,7 @@ Resources:
       NumNodeGroups: !Ref NumShards
       ReplicasPerNodeGroup: !Ref NumReplicas
       PreferredMaintenanceWindow: 'sat:07:00-sat:08:00'
-      SecurityGroupIds:
-      - !If [HasSecurityGroup, !Ref SecurityGroup, !Ref 'AWS::NoValue']
+      SecurityGroupIds: [!Ref SecurityGroup]
       SnapshotName: !If [HasSnapshotName, !Ref SnapshotName, !Ref 'AWS::NoValue']
       SnapshotRetentionLimit: !Ref SnapshotRetentionLimit
       SnapshotWindow: '00:00-03:00'
@@ -508,6 +507,6 @@ Outputs:
       Name: !Sub '${AWS::StackName}-PrimaryEndPointPort'
   SecurityGroupId:
     Description: 'The security group used to manage access to Elasticache Redis.'
-    Value: !Ref SecurityGroup
+    Value: !Ref SecurityGroup 
     Export:
       Name: !Sub '${AWS::StackName}-SecurityGroupId'

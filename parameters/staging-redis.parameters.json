@@ -1,11 +1,11 @@
 [
   {
     "ParameterKey": "ParentVPCStack",
-    "ParameterValue": "RiSolve-HIPAA-Infra-StgStack-PN84MHR3U8EH"
+    "ParameterValue": "RiSolve-HIPAA-Infra-StgStack-30IPNXQZEYNG"
   },
   {
-    "ParameterKey": "ClientSecurityGroup",
-    "ParameterValue": ""
+    "ParameterKey": "WebVPCStack",
+    "ParameterValue": "RiSolve-Staging-Web"
   },
   {
     "ParameterKey": "EngineVersion",
