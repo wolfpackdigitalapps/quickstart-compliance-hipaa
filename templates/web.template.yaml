@@ -169,7 +169,7 @@ Resources:
               - 
                 Effect: Allow
                 Action: 'secretsmanager:DescribeSecret'
-                Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '*']]]]
+                Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '/*']]]]
         - PolicyName: EC2InstanceProfileGetSecretValue
           PolicyDocument:
             Version: "2012-10-17"
@@ -177,10 +177,7 @@ Resources:
               - 
                 Effect: Allow
                 Action: 'secretsmanager:GetSecretValue'
-                Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '*']]]]
-                Condition:
-                  'ForAnyValue:StringLike':
-                    'secretsmanager:VersionStage': 'AWSCURRENT' 
+                Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '/*']]]]
   EC2IAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
