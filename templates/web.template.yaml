@@ -345,7 +345,17 @@ Resources:
       LoadBalancerArn: !Ref WebLoadBalancer
       Port: 80
       Protocol: HTTP
-
+  S3Bucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        AccessControl: PublicRead
+        Tags:
+          -
+            Key: EnvironmentStage
+            Value: !Ref EnvironmentStage
+          -
+            Key: Application
+            Value: !Ref Application
 ###############################################################################
 # Outputs 
 ###############################################################################   
