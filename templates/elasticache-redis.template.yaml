@@ -204,7 +204,7 @@ Resources:
       GenerateSecretString:
         SecretStringTemplate: '{}'
         GenerateStringKey: "password"
-        ExcludeCharacters: '"@/\'
+        ExcludeCharacters: "\"%'()*+,./\\:;=?@[]_`{}|~"
         PasswordLength: 64
   ElastiCacheAuthTokenSecretResourcePolicy:
     Type: AWS::SecretsManager::ResourcePolicy
