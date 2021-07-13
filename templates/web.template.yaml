@@ -178,6 +178,16 @@ Resources:
                 Effect: Allow
                 Action: 'secretsmanager:GetSecretValue'
                 Resource: !Join [':', ['arn:aws:secretsmanager', !Ref 'AWS::Region', !Ref 'AWS::AccountId', 'secret', !Join ['', [!Ref EnvironmentStage, '/*']]]]
+        - PolicyName: EC2RegisterTargetsForTargetGroup
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - elasticloadbalancing:RegisterTargets
+                  - elasticloadbalancing:DeregisterTargets
+                Resource: !Ref WebLoadBalancerTargetGroup
   EC2IAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -191,7 +201,7 @@ Resources:
       IpProtocol: tcp
       FromPort: 80
       ToPort: 80
-      SourceSecurityGroupId: !Ref WebLoadBalancerSecurityGroup
+      SourcePrefixListId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-PublicPrefixList'}
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties: 
@@ -201,7 +211,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          SourcePrefixListId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-PublicPrefixList'} 
+          SourcePrefixListId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-PublicPrefixList'}
       Tags: 
         -
           Key: Name
@@ -234,11 +244,20 @@ Resources:
               VolumeSize: 8
               DeleteOnTermination: false
               Encrypted: true
-        UserData: !Base64 |
-          #!/bin/bash -ex
-          sudo apt update 
-          sudo apt -y install apache2
-          sudo systemctl start apache2
+        UserData: 
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash -ex
+              sudo apt update 
+              sudo apt -y install apache2
+              sudo systemctl start apache2
+              aws elbv2 register-targets --region ${AWS::Region} --target-group-arn ${WebLoadBalancerTargetGroup} --targets Id=$(ec2metadata --local-ipv4),Port=80,AvailabilityZone=all
+
+              echo '#!/bin/bash' | sudo tee -a /etc/init.d/deregister
+              echo 'aws elbv2 deregister-targets --region ${AWS::Region} --target-group-arn ${WebLoadBalancerTargetGroup} --targets Id=$(ec2metadata --local-ipv4),Port=80,AvailabilityZone=all' | sudo tee -a /etc/init.d/deregister
+              sudo chmod +x /etc/init.d/deregister
+              sudo chown root:root /etc/init.d/deregister
+              sudo ln -s /etc/init.d/deregister /etc/rc0.d/K01deregister
         TagSpecifications:
           - ResourceType: instance
             Tags:
@@ -258,8 +277,6 @@ Resources:
         LaunchTemplateId: !Ref EC2LaunchTemplate
         Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
       VPCZoneIdentifier: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]
-      TargetGroupARNs:
-        - !Ref WebLoadBalancerTargetGroup
   WebLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties: 
@@ -267,25 +284,23 @@ Resources:
       # TODO: Add S3 access log
       # LoadBalancerAttributes: 
       #   - LoadBalancerAttribute
-      Name: !Sub '${Application}-${EnvironmentStage}-internal-ELB'
-      Scheme: internal
+      Name: !Sub '${Application}-${EnvironmentStage}-public-elb'
+      Scheme: internet-facing
       SecurityGroups:
         - !Ref WebLoadBalancerSecurityGroup
-      Subnets: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]
+      Subnets: !Split [',', {'Fn::ImportValue': !Sub '${MgmtVPCStack}-SubnetsPublic'}]
       Tags:
         - Key: EnvironmentStage
           Value: !Ref EnvironmentStage
         - Key: Application
           Value: !Ref Application
-        - Key: Usage
-          Value: internal
       Type: application
   WebLoadBalancerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub 'internal-${Application}-${EnvironmentStage}'
-      TargetType: instance
-      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
+      Name: !Sub '${Application}-${EnvironmentStage}'
+      TargetType: ip
+      VpcId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-VPC'}
       Protocol: HTTP
       Port: 80
       Tags: 
@@ -295,35 +310,32 @@ Resources:
         - 
           Key: Application 
           Value: !Ref Application
-  WebLoadBalancerHTTPIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref WebLoadBalancerSecurityGroup
-      IpProtocol: tcp
-      FromPort: 80
-      ToPort: 80
-      SourcePrefixListId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-PublicPrefixList'} 
   WebLoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties: 
-      GroupDescription: Security group for internal Application load balancer
-      GroupName: !Join ['-', ['internal', !Ref Application, !Ref EnvironmentStage, 'sg']]
+      GroupDescription: Security group for Application load balancer
+      GroupName: !Join ['-', [!Ref Application, !Ref EnvironmentStage, 'sg']]
       SecurityGroupEgress: 
        - IpProtocol: tcp
          FromPort: 80
          ToPort: 80
-         DestinationSecurityGroupId: !Ref EC2SecurityGroup
+         DestinationPrefixListId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-PrefixList'}
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      VpcId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-VPC'}
       Tags: 
         -
           Key: Name
-          Value: !Sub 'internal-${Application}-${EnvironmentStage}-ELB-SecurityGroup'
+          Value: !Sub '${Application}-${EnvironmentStage}-ELB-SecurityGroup'
         - 
           Key: EnvironmentStage
           Value: !Ref EnvironmentStage
         - 
           Key: Application 
           Value: !Ref Application
-      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
   HTTPlistener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
