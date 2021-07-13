@@ -248,16 +248,7 @@ Resources:
           Fn::Base64:
             !Sub |
               #!/bin/bash -ex
-              sudo apt update 
-              sudo apt -y install apache2
-              sudo systemctl start apache2
               aws elbv2 register-targets --region ${AWS::Region} --target-group-arn ${WebLoadBalancerTargetGroup} --targets Id=$(ec2metadata --local-ipv4),Port=80,AvailabilityZone=all
-
-              echo '#!/bin/bash' | sudo tee -a /etc/init.d/deregister
-              echo 'aws elbv2 deregister-targets --region ${AWS::Region} --target-group-arn ${WebLoadBalancerTargetGroup} --targets Id=$(ec2metadata --local-ipv4),Port=80,AvailabilityZone=all' | sudo tee -a /etc/init.d/deregister
-              sudo chmod +x /etc/init.d/deregister
-              sudo chown root:root /etc/init.d/deregister
-              sudo ln -s /etc/init.d/deregister /etc/rc0.d/K01deregister
         TagSpecifications:
           - ResourceType: instance
             Tags:
@@ -303,6 +294,7 @@ Resources:
       VpcId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-VPC'}
       Protocol: HTTP
       Port: 80
+      HealthCheckPath: '/health'
       Tags: 
         - 
           Key: EnvironmentStage
