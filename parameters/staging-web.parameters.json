@@ -9,7 +9,7 @@
   },
   {
     "ParameterKey": "EC2InstanceType",
-    "ParameterValue": "t2.nano"
+    "ParameterValue": "t3.micro"
   },
   {
     "ParameterKey": "Application", 
