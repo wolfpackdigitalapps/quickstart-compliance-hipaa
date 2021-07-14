@@ -14,6 +14,10 @@
   {
     "ParameterKey": "Application", 
     "ParameterValue": "RiSolve"
+  },
+  {
+    "ParameterKey": "ELBCertificateARN",
+    "ParameterValue": "arn:aws:acm:eu-west-1:544060213720:certificate/ac9313df-cb50-4da5-bec4-934a3db69c9a"
   }
 ]
 

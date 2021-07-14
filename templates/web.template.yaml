@@ -87,6 +87,10 @@ Parameters:
     Type: AWS::EC2::Image::Id
     Default: ami-0874dad5025ca362c
 
+  ELBCertificateARN:
+    Description: ACM SSL certificate ARN to be used for Application Load Balancer
+    Type: String
+
   ###########################################################################
   # Mandatory tags that will be added to all resources that support tags
   ###########################################################################
@@ -314,8 +318,8 @@ Resources:
          DestinationPrefixListId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-PrefixList'}
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
+          FromPort: 443
+          ToPort: 443
           CidrIp: 0.0.0.0/0
       VpcId: {'Fn::ImportValue': !Sub '${MgmtVPCStack}-VPC'}
       Tags: 
@@ -335,8 +339,10 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref WebLoadBalancerTargetGroup
       LoadBalancerArn: !Ref WebLoadBalancer
-      Port: 80
-      Protocol: HTTP
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref ELBCertificateARN
   S3Bucket:
       Type: 'AWS::S3::Bucket'
       Properties:

@@ -18,6 +18,10 @@
   {
     "ParameterKey": "EnvironmentStage", 
     "ParameterValue": "production"
+  },
+  {
+    "ParameterKey": "ELBCertificateARN",
+    "ParameterValue": "arn:aws:acm:eu-west-1:544060213720:certificate/d25aa590-217a-4451-896d-54d953e8381b"
   }
 ]
 
