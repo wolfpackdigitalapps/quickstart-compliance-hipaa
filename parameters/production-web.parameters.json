@@ -1,0 +1,23 @@
+[
+  {
+    "ParameterKey": "ParentVPCStack",
+    "ParameterValue": "RiSolve-HIPAA-Infra-ProdStack-19Q3GJLVMNE5T"         
+  },
+  {
+    "ParameterKey": "MgmtVPCStack",
+    "ParameterValue": "RiSolve-HIPAA-Infra-MgmtStack-1IAXJBCEWCDVF"         
+  },
+  {
+    "ParameterKey": "EC2InstanceType",
+    "ParameterValue": "t3.medium"
+  },
+  {
+    "ParameterKey": "Application", 
+    "ParameterValue": "risolve"
+  },
+  {
+    "ParameterKey": "EnvironmentStage", 
+    "ParameterValue": "production"
+  }
+]
+

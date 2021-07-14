@@ -191,7 +191,7 @@ Resources:
   EC2IAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: !Join ['-', [ !Ref Application, 'instance-profile']] 
+      InstanceProfileName: !Join ['-', [ !Ref Application, !Ref EnvironmentStage, 'instance-profile']] 
       Roles:
         - !Ref EC2InstanceProfileRole
   EC2SecurityGroupHTTPIngress:

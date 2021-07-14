@@ -1,0 +1,42 @@
+[
+  {
+    "ParameterKey": "ParentVPCStack",
+    "ParameterValue": "RiSolve-HIPAA-Infra-ProdStack-19Q3GJLVMNE5T"
+  },
+  {
+    "ParameterKey": "WebVPCStack",
+    "ParameterValue": "RiSolve-Production-Web"
+  },
+  {
+    "ParameterKey": "EngineVersion",
+    "ParameterValue": "5.0.6"
+  },
+  {
+    "ParameterKey": "CacheNodeType",
+    "ParameterValue": "cache.t2.micro"
+  },
+  {
+    "ParameterKey": "TransitEncryption",
+    "ParameterValue": "true"
+  },
+  {
+    "ParameterKey": "SnapshotRetentionLimit",
+    "ParameterValue": "2"
+  },
+  {
+    "ParameterKey": "NumShards",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "NumReplicas",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "NotificationList",
+    "ParameterValue": "mariusz@wolfpack-digital.com"
+  },
+  {
+    "ParameterKey": "EnvironmentStage",
+    "ParameterValue": "production"
+  }  
+]

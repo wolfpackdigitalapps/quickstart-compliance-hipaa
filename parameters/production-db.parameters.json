@@ -1,0 +1,50 @@
+[
+  {
+    "ParameterKey": "ParentVPCStack", 
+    "ParameterValue": "RiSolve-HIPAA-Infra-ProdStack-19Q3GJLVMNE5T"
+  },
+  {
+    "ParameterKey": "WebVPCStack", 
+    "ParameterValue": "RiSolve-Production-Web"
+  },
+  {
+    "ParameterKey": "DBName", 
+    "ParameterValue": "risolve_production_db"
+  },
+  {
+    "ParameterKey": "DBPort", 
+    "ParameterValue": "5432"
+  },
+  {
+    "ParameterKey": "DBUsername", 
+    "ParameterValue": "risolve"
+  },
+  {
+    "ParameterKey": "DBEngineVersion", 
+    "ParameterValue": "10.11" 
+  },
+  {
+    "ParameterKey": "DBInstanceClass", 
+    "ParameterValue": "db.t3.large"
+  },
+  {
+    "ParameterKey": "EnvironmentStage", 
+    "ParameterValue": "production"
+  },
+  {
+    "ParameterKey": "Application", 
+    "ParameterValue": "risolve"
+  },
+  {
+    "ParameterKey": "NotificationList", 
+    "ParameterValue": "mariusz@wolfpack-digital.com"
+  },
+  {
+    "ParameterKey": "Confidentiality", 
+    "ParameterValue": "pii/phi"
+  },
+  {
+    "ParameterKey": "Compliance", 
+    "ParameterValue": "hipaa"
+  }
+]
